@@ -22,6 +22,7 @@ update_user_schema = UpdateUserSchema(partial=True)
 @response(user_schema, 201)
 @other_responses({400: "Bad Request!"})
 def create_user(args):
+    """Create a new user"""
     user_data = request.get_json()
     password = user_data.pop("password")
     user = User(**user_data)
@@ -34,6 +35,7 @@ def create_user(args):
 @authenticate(token_auth)
 @response(users_schema)
 def get_users():
+    """Get all users"""
     users = User.objects
     return users
 
@@ -67,6 +69,7 @@ def update_user(data, id):
         abort(400)
     user.update(**data)
     user.save()
+    user.reload()
     return user
 
 
@@ -82,4 +85,5 @@ def update_me(data):
         abort(400)
     user.update(**data)
     user.save()
+    user.reload()
     return user

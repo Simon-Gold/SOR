@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, request
 from flask_cors import CORS
 from flask_mail import Mail
 from flask_marshmallow import Marshmallow
+from apifairy import APIFairy
 # internals
 from config import Config
 
@@ -9,7 +10,7 @@ from config import Config
 cors = CORS()
 mail = Mail()
 marsh = Marshmallow()
-
+apifairy = APIFairy()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -40,6 +41,8 @@ def create_app(config_class=Config):
     ]
     models.db.init_app(app)
 
+    # api documentation
+    apifairy.init_app(app)
 
     # serialization/deserialization Marshmellow
     marsh.init_app(app)

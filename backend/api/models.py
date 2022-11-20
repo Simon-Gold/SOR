@@ -31,6 +31,8 @@ class User(db.Document):
         required=True,
         min_length=5,
     )
+    def __str__(self):
+        return self.username
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
