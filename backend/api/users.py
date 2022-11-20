@@ -19,15 +19,15 @@ update_user_schema = UpdateUserSchema(partial=True)
 
 @users.route('/users/', methods=['POST'])
 @body(user_schema)
-# @response(user_schema, 201)
-# @other_responses({400: "Bad Request!"})
+@response(user_schema, 201)
+@other_responses({400: "Bad Request!"})
 def create_user(args):
     user_data = request.get_json()
     password = user_data.pop("password")
     user = User(**user_data)
     user.set_password(password)
     user.save()
-    return jsonify(user)
+    return user
     
 
 @users.route('/users/', methods=['GET'])
@@ -55,16 +55,31 @@ def get(id):
     return User.objects(pk=id).first() or abort(404)
 
 
-# @users.route('/me', methods=['PUT'])
-# @authenticate(token_auth)
-# @body(update_user_schema)
-# @response(user_schema)
-# def put(data):
-#     """Edit user information"""
-#     user = token_auth.current_user()
-#     if 'password' in data and ('old_password' not in data or
-#                                not user.verify_password(data['old_password'])):
-#         abort(400)
-#     # TODO
-#     user.update(data)
-#     return user
+@users.route('/users/<string:id>', methods=['PUT'])
+@authenticate(token_auth)
+@body(update_user_schema)
+@response(user_schema)
+def update_user(data, id):
+    """Edit other user information"""
+    user = User.objects.get(id=id)
+    if 'password' in data and ('old_password' not in data or
+                               not user.verify_password(data['old_password'])):
+        abort(400)
+    user.update(**data)
+    user.save()
+    return user
+
+
+@users.route('/users/me', methods=['PUT'])
+@authenticate(token_auth)
+@body(update_user_schema)
+@response(user_schema)
+def update_me(data):
+    """Edit user information"""
+    user = token_auth.current_user()
+    if 'password' in data and ('old_password' not in data or
+                               not user.verify_password(data['old_password'])):
+        abort(400)
+    user.update(**data)
+    user.save()
+    return user

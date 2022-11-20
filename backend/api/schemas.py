@@ -67,6 +67,7 @@ class UserSchema(ma.Schema):
     class Meta:
         ordered = True
 
+    id = ma.String(unique=True, dump_only=True)
     full_name = ma.String(validate=validate.Length(min=3, max=64))# TODO will remove
     first_name = ma.String(validate=validate.Length(min=3, max=64))
     last_name = ma.String(validate=validate.Length(min=3, max=64))

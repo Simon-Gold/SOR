@@ -81,7 +81,7 @@ class User(db.Document):
                               algorithms=['HS256'])
         except jwt.PyJWTError:
             return
-        return User.objects(email=data['reset_email']).first()
+        return User.objects.get(email=data['reset_email'])
 
 
 

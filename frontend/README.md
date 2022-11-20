@@ -1,5 +1,12 @@
 # frontend
 
+### Node & NPM versions
+```
+ └─ λ node --version
+v14.20.1
+ └─ λ npm --version
+6.14.17
+```
 ## Project setup
 ```
 npm install
