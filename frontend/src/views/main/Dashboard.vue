@@ -26,8 +26,8 @@ export default class Dashboard extends Vue {
   get greetedUser() {
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
-      if (userProfile.full_name) {
-        return userProfile.full_name;
+      if (userProfile.first_name || userProfile.last_name) {
+        return userProfile.first_name + ' ' + userProfile.last_name;
       } else {
         return userProfile.email;
       }

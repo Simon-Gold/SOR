@@ -11,7 +11,9 @@
       <template slot="items" slot-scope="props">
         <td>{{ props.item.id }}</td>
         <td>{{ props.item.email }}</td>
-        <td>{{ props.item.full_name }}</td>
+        <td>{{ props.item.first_name }}</td>
+        <td>{{ props.item.last_name }}</td>
+        <td>{{ props.item.username }}</td>
         <td><v-icon v-if="props.item.is_active">checkmark</v-icon></td>
         <td><v-icon v-if="props.item.is_superuser">checkmark</v-icon></td>
         <td class="justify-center layout px-0">
@@ -50,9 +52,21 @@ export default class AdminUsers extends Vue {
       align: 'left',
     },
     {
-      text: 'Full Name',
+      text: 'First Name',
       sortable: true,
-      value: 'full_name',
+      value: 'firs_name',
+      align: 'left',
+    },
+    {
+      text: 'Last Name',
+      sortable: true,
+      value: 'last_name',
+      align: 'left',
+    },
+    {
+      text: 'Username',
+      sortable: true,
+      value: 'username',
       align: 'left',
     },
     {

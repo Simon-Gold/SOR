@@ -8,30 +8,17 @@
         <template>
           <div class="my-3">
             <div class="subheading secondary--text text--lighten-2">User</div>
-            <div class="title primary--text text--darken-2" v-if="userProfile.full_name">{{userProfile.full_name}}</div>
-            <div class="title primary--text text--darken-2" v-else>{{userProfile.email}}</div>
+            <div class="title primary--text text--darken-2" v-if="fName">{{ fName }}</div>
+            <div class="title primary--text text--darken-2" v-else>{{ userProfile.email }}</div>
           </div>
           <v-form ref="form">
-            <v-text-field 
-              type="password"
-              ref="password"
-              label="Password"
-              data-vv-name="password"
-              data-vv-delay="100"
-              data-vv-rules="required"
-              v-validate="'required'"
-              v-model="password1"
+            <v-text-field type="password" ref="password" label="Password" data-vv-name="password" data-vv-delay="100"
+              data-vv-rules="required" v-validate="'required'" v-model="password1"
               :error-messages="errors.first('password')">
             </v-text-field>
-            <v-text-field
-              type="password"
-              label="Confirm Password"
-              data-vv-name="password_confirmation"
-              data-vv-delay="100"
-              data-vv-rules="required|confirmed:$password"
-              data-vv-as="password"
-              v-validate="'required|confirmed:password'"
-              v-model="password2"
+            <v-text-field type="password" label="Confirm Password" data-vv-name="password_confirmation"
+              data-vv-delay="100" data-vv-rules="required|confirmed:$password" data-vv-as="password"
+              v-validate="'required|confirmed:password'" v-model="password2"
               :error-messages="errors.first('password_confirmation')">
             </v-text-field>
           </v-form>
@@ -62,6 +49,15 @@ export default class UserProfileEdit extends Vue {
 
   get userProfile() {
     return readUserProfile(this.$store);
+  }
+
+  get fName() {
+    const user = readUserProfile(this.$store);
+    if (user?.first_name || user?.last_name) {
+      return user.first_name + ' ' + user.last_name;
+    } else {
+      return user?.email;
+    }
   }
 
   public reset() {
