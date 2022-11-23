@@ -1,28 +1,24 @@
-# Stage 0, "build-stage", based on Node.js, to build and compile the frontend
-FROM tiangolo/node-frontend:10 as build-stage
+# base image
+FROM node:13.12.0-alpine3.11
 
+# FROM node:14.20.1-alpine
+
+# set working directory
 WORKDIR /app
 
-COPY package*.json /app/
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
+# g++ compiler for fibers and sass
+RUN apk add python make g++
+
+# install app dependencies
+COPY ./package.json /app/package.json
+COPY ./package-lock.json /app/package-lock.json
 RUN npm install
+RUN npm install @vue/cli -g
 
-COPY ./ /app/
+# copy files
+COPY . /app
 
-ARG FRONTEND_ENV=production
-
-ENV VUE_APP_ENV=${FRONTEND_ENV}
-
-# Comment out the next line to disable tests
-RUN npm run test:unit
-
-RUN npm run build
-
-
-# Stage 1, based on Nginx, to have only the compiled app, ready for production with Nginx
-FROM nginx:1.15
-
-COPY --from=build-stage /app/dist/ /usr/share/nginx/html
-
-COPY --from=build-stage /nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./nginx-backend-not-found.conf /etc/nginx/extra-conf.d/backend-not-found.conf
+CMD npm run serve
