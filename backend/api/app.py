@@ -53,14 +53,15 @@ def create_app(config_class=Config):
         cors.init_app(app)
 
     # blueprints
-    API_URL_PREFIX_ = "/api/v1"
+    API_URL_PREFIX = "/api/v1"
     from api.errors import errors
     app.register_blueprint(errors)
     from api.tokens import tokens
-    app.register_blueprint(tokens, url_prefix=API_URL_PREFIX_)
+    app.register_blueprint(tokens, url_prefix=API_URL_PREFIX)
     from api.users import users
-    app.register_blueprint(users, url_prefix=API_URL_PREFIX_)
-    
+    app.register_blueprint(users, url_prefix=API_URL_PREFIX)
+    from api.offender.views import offenders
+    app.register_blueprint(offenders, url_prefix=API_URL_PREFIX)
 
     # define the shell context
     # @app.shell_context_processor
