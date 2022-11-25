@@ -9,6 +9,10 @@ import router from './router';
 import store from '@/store';
 import './registerServiceWorker';
 import 'vuetify/dist/vuetify.min.css';
+import 'jquery/dist/jquery.min.js'
+import 'bulma/css/bulma.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.min.js';
 
 Vue.config.productionTip = false;
 
