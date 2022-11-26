@@ -20,25 +20,6 @@ def create_app(config_class=Config):
     
 
     from api import models
-    # TODO get these from os.environ
-    app.config["MONGODB_SETTINGS"] = [
-        {
-            "db": "devdb", 
-            "host": "localhost", 
-            "port": 27017, 
-            "alias": "default", 
-            "username": "developer", 
-            "password": "developer"
-        },
-        {
-            "MONGODB_DB": "devdb2",
-            "MONGODB_HOST": "localhost",
-            "MONGODB_PORT": 27017, 
-            "MONGODB_ALIAS": "secondary",
-            "username":"developer",
-            "password":"developer"
-        },
-    ]
     models.db.init_app(app)
 
     # api documentation

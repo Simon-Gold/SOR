@@ -1,27 +1,22 @@
 # pull official base image
-FROM python:3.10-slim
+FROM python:3.10.8-slim-buster
 
-# install dependencies
-RUN apt-get update && apt-get install -y apt-transport-https && \
-    apt-get install -y libssl-dev libffi-dev gcc python3-dev musl-dev build-essential \
-    libpq-dev netcat-openbsd
+# set work directory
+WORKDIR /usr/src/app
 
-# set environment varibles
+# set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# set working directory
-WORKDIR /usr/src/app
+# install system dependencies
+RUN apt-get update && apt-get install -y netcat
 
-# add and install requirements
+# install dependencies
+RUN pip install --upgrade pip
 COPY ./requirements.txt /usr/src/app/requirements.txt
 RUN pip install -r requirements.txt
 
-# # add entrypoint.sh
-# COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
-# RUN chmod +x /usr/src/app/entrypoint.sh
+# copy project
+COPY . /usr/src/app/
 
-# add app
-COPY . /usr/src/app
-
-
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
