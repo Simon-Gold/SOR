@@ -49,23 +49,6 @@
       </div>
     </div>
 
-    <!-- <v-card class="ma-3 pa-3">
-      <v-card-title primary-title>
-        <div class="headline primary--text">Dashboard</div>
-      </v-card-title>
-      <v-card-text>
-        <template>
-          <v-text-field label="Search By First Name" v-model="firstName" @change="filterUserList"></v-text-field>
-        </template>
-        <v-data-table :headers="headers" :items="users">
-          <template slot="items" slot-scope="props">
-            <td>{{ props.item.email }}</td>
-            <td>{{ props.item.first_name }}</td>
-            <td>{{ props.item.last_name }}</td>
-          </template>
-        </v-data-table>
-      </v-card-text>
-    </v-card> -->
   </v-container>
 </template>
 
@@ -81,27 +64,27 @@ export default class Dashboard extends Vue {
 
   public firstName = '';
   public filterList: any;
-  public users: any;
 
-  // get users() {
-  //   // this.userList = readAdminUsers(this.$store);
-  //   // return this.userList;
-  //   return readAdminUsers(this.$store);
-  // }
+  get users() {
+    return readAdminUsers(this.$store);
+  }
+
+  created() {
+     this.filterList = readAdminUsers(this.$store);
+     console.log(this.filterList);
+  }
 
   public async mounted() {
     await dispatchGetUsers(this.$store);
   }
 
   public filterUserList() {
-    this.filterList = this.users.filter(u => u.first_name.indexOf(this.firstName) > -1);
+    this.filterList = this.filterList.filter(u => u.first_name.indexOf(this.firstName) > -1);
     
     // filtering worked but the change was not reflected in the table
   }
 
   get greetedUser() {
-    this.users = readAdminUsers(this.$store);
-    this.filterList = this.users.slice();
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
       if (userProfile.first_name || userProfile.last_name) {

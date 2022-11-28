@@ -1,6 +1,58 @@
 <template>
   <v-container fluid>
-    <v-card class="ma-3 pa-3">
+
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <h6 class="m-0">Edit User Profile</h6>
+        </div>
+      </div>
+      <hr>
+      <div class="row ">
+        <div class="col-12">
+          <div class="field">
+            <label class="label">First Name</label>
+            <div class="control">
+              <input class="input" :class="{'is-danger': showFNError}" type="text" v-model="firstName" @input="checkFN" placeholder="Enter First Name">
+            </div>
+            <p class="help is-danger" v-if="showFNError">Please enter first name</p>
+          </div>
+          <div class="field">
+            <label class="label">Last Name</label>
+            <div class="control">
+              <input class="input" :class="{'is-danger': showFNError}" type="text" v-model="lastName" @input="checkLN" placeholder="Enter last name">
+            </div>
+            <p class="help is-danger" v-if="showLNError">Please enter last name</p>
+          </div>
+          <div class="field">
+            <label class="label">Email</label>
+            <div class="control has-icons-left has-icons-right">
+              <input class="input" :class="{'is-danger': showFNError}" type="email" v-model="email" @input="checkEmail" placeholder="Enter email address">
+              <span class="icon is-small is-left">
+                <i class="material-icons">mail</i>
+              </span>
+              <span class="icon is-small is-right" v-if="showEmailError">
+                <i class="material-icons">warning</i>
+              </span>
+            </div>
+            <p class="help is-danger"  v-if="showEmailError">{{emailErrorMessage}}</p>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-12 text-right">
+          <div class="buttons" style="justify-content: flex-end;">
+            <button class="button is-dark" @click="cancel">Cancel</button>
+            <button class="button is-warning" @click="reset">Reset</button>
+            <button class="button is-success" @click="submit" :disabled="!valid">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- <v-card class="ma-3 pa-3">
       <v-card-title primary-title>
         <div class="headline primary--text">Edit User Profile</div>
       </v-card-title>
@@ -22,7 +74,7 @@
           Save
         </v-btn>
       </v-card-actions>
-    </v-card>
+    </v-card> -->
   </v-container>
 </template>
 
@@ -40,12 +92,40 @@ export default class UserProfileEdit extends Vue {
   public lastName: string = '';
   public email: string = '';
 
+  public showFNError: boolean = false;
+  public showLNError: boolean = false;
+  public showEmailError: boolean = false;
+  public emailErrorMessage: string = '';
+  public regex = new RegExp('/^\S+@\S+\.\S+$/', 'gi');
+
   public created() {
     const userProfile = readUserProfile(this.$store);
     if (userProfile) {
       this.firstName = userProfile.first_name;
       this.lastName = userProfile.last_name;
       this.email = userProfile.email;
+    }
+  }
+
+  checkFN() {
+    this.showFNError = this.firstName.length > 0 ? false : true;
+  }
+
+  checkLN() {
+    this.showLNError = this.lastName.length > 0 ? false : true;
+  }
+
+  checkEmail() {
+    if (this.email.length > 0) {
+      if (!this.email.match(this.regex)) {
+        this.showEmailError = true;
+        this.emailErrorMessage = 'This email address invalid';
+      } else {
+        this.showEmailError = false;
+      }
+    } else {
+      this.showEmailError = true;
+      this.emailErrorMessage = 'Please enter email address';
     }
   }
 
