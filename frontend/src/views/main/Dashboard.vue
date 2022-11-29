@@ -32,7 +32,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="user, index in filterList">
+                      <tr v-for="user, index in users">
                         <td>{{ index + 1 }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.first_name }}</td>

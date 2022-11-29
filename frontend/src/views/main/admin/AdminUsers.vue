@@ -1,91 +1,83 @@
 <template>
-  <div>
-    <v-toolbar light>
-      <v-toolbar-title>
-        Manage Users
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" to="/main/admin/users/create">Create User</v-btn>
-    </v-toolbar>
-    <v-data-table :headers="headers" :items="users">
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.id }}</td>
-        <td>{{ props.item.email }}</td>
-        <td>{{ props.item.first_name }}</td>
-        <td>{{ props.item.last_name }}</td>
-        <td>{{ props.item.username }}</td>
-        <td><v-icon v-if="props.item.is_active">checkmark</v-icon></td>
-        <td><v-icon v-if="props.item.is_superuser">checkmark</v-icon></td>
-        <td class="justify-center layout px-0">
-          <v-tooltip top>
-            <span>Edit</span>
-            <v-btn slot="activator" flat :to="{name: 'main-admin-users-edit', params: {id: props.item.id}}">
-              <v-icon>edit</v-icon>
-            </v-btn>
-          </v-tooltip>
-        </td>
-      </template>
-    </v-data-table>
+  <div class="container">
+    <div class="card">
+      <div class="card-body">
+        <div
+          class="card-title d-flex justify-content-between align-items-center"
+        >
+          <h4>Manage Users</h4>
+          <router-link :to="{ name: 'main-admin-users-create' }" tag="button">
+            <button
+              type="button"
+              class="button is-primary"
+              style="max-width: fit-content; float: right"
+            >
+              <i class="material-icons mr-1">add</i> Crate User
+            </button>
+          </router-link>
+        </div>
+        <hr />
+        <div class="row">
+          <div class="col">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Email</th>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Username</th>
+                  <th>İs Active</th>
+                  <th>İs Superuser</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="user in users">
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.first_name }}</td>
+                  <td>{{ user.last_name }}</td>
+                  <td>{{ user.username }}</td>
+                  <td>
+                    <i v-if="user.is_active" class="material-icons">check</i>
+                  </td>
+                  <td>
+                    <i v-if="user.is_superuser" class="material-icons">check</i>
+                  </td>
+                  <td>
+                    <router-link
+                      :to="{
+                        name: 'main-admin-users-edit',
+                        params: { id: user.id },
+                      }"
+                      tag="button"
+                    >
+                      <button class="button is-info is-small">
+                        <i class="material-icons">edit</i>
+                      </button>
+                    </router-link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { Store } from 'vuex';
-import { IUserProfile } from '@/interfaces';
-import { readAdminUsers } from '@/store/admin/getters';
-import { dispatchGetUsers } from '@/store/admin/actions';
+import { Component, Vue } from "vue-property-decorator";
+import { Store } from "vuex";
+import { IUserProfile } from "@/interfaces";
+import { readAdminUsers } from "@/store/admin/getters";
+import { dispatchGetUsers } from "@/store/admin/actions";
 
 @Component
 export default class AdminUsers extends Vue {
-  public headers = [
-    {
-      text: 'ID',
-      sortable: true,
-      value: 'id',
-      align: 'left',
-    },
-    {
-      text: 'Email',
-      sortable: true,
-      value: 'email',
-      align: 'left',
-    },
-    {
-      text: 'First Name',
-      sortable: true,
-      value: 'firs_name',
-      align: 'left',
-    },
-    {
-      text: 'Last Name',
-      sortable: true,
-      value: 'last_name',
-      align: 'left',
-    },
-    {
-      text: 'Username',
-      sortable: true,
-      value: 'username',
-      align: 'left',
-    },
-    {
-      text: 'Is Active',
-      sortable: true,
-      value: 'isActive',
-      align: 'left',
-    },
-    {
-      text: 'Is Superuser',
-      sortable: true,
-      value: 'isSuperuser',
-      align: 'left',
-    },
-    {
-      text: 'Actions',
-      value: 'id',
-    },
-  ];
+
   get users() {
     return readAdminUsers(this.$store);
   }
