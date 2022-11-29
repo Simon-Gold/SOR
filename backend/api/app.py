@@ -31,7 +31,7 @@ def create_app(config_class=Config):
     mail.init_app(app)
     # CORS
     if app.config['USE_CORS']:  # pragma: no branch
-        cors.init_app(app)
+        cors.init_app(app, origins="*")
 
     # blueprints
     API_URL_PREFIX = "/api/v1"
