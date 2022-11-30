@@ -1,42 +1,82 @@
 <template>
-  <v-content>
-    <v-container fluid fill-height>
-      <v-layout align-center justify-center>
-        <v-flex xs12 sm8 md4>
-          <v-card class="elevation-12">
-            <v-toolbar dark color="primary">
-              <v-toolbar-title>{{appName}} - Password Recovery</v-toolbar-title>
-            </v-toolbar>
-            <v-card-text>
-              <p class="subheading">A password recovery email will be sent to the registered account</p>
-              <v-form @keyup.enter="submit" v-model="valid" ref="form" @submit.prevent="" lazy-validation>
-                <v-text-field @keyup.enter="submit" label="Username" type="text" prepend-icon="person" v-model="username" v-validate="'required'" data-vv-name="username" :error-messages="errors.collect('username')" required></v-text-field>
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn @click="cancel">Cancel</v-btn>
-              <v-btn @click.prevent="submit" :disabled="!valid">
-                Recover Password
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-flex>
-      </v-layout>
-    </v-container>
-  </v-content>
+  <div class="container d-flex justify-content-center align-items-center">
+    <div class="card" style="max-width: 500px !important">
+      <header class="card-header" style="background-color: #00d1b2">
+        <h4 class="card-header-title m-0" style="color: white">
+          {{ appName }} - Password Recovery
+        </h4>
+      </header>
+      <div class="card-content">
+        <div class="content">
+          <p>
+            A password recovery email will be sent to the registered account
+          </p>
+          <div class="row">
+            <div class="col-12">
+              <form @keyup.enter="submit">
+                <div class="field">
+                  <label class="label">Username</label>
+                  <div class="control has-icons-left">
+                    <input
+                      type="text"
+                      class="input"
+                      v-model="username"
+                      @keyup.enter="submit"
+                      @input="checkUN"
+                      required
+                    />
+                    <span class="icon is-small is-left">
+                      <i class="material-icons">person</i>
+                    </span>
+                  </div>
+                  <p class="help is-danger" v-if="showError">
+                    This username field is required
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+          <hr />
+          <div class="row">
+            <div class="col-12">
+              <div class="buttons" style="float: right;">
+                <button type="button" class="button is-dark" @click="cancel">
+                  Login
+                </button>
+                <button
+                  type="submit"
+                  class="button is-link"
+                  @click.prevent="submit"
+                  :disabled="!username"
+                >
+                  Recover Password
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import { appName } from '@/env';
-import { dispatchPasswordRecovery } from '@/store/main/actions';
+import { Component, Vue } from "vue-property-decorator";
+import { appName } from "@/env";
+import { dispatchPasswordRecovery } from "@/store/main/actions";
 
 @Component
 export default class Login extends Vue {
   public valid = true;
-  public username: string = '';
+  public username: string = "";
   public appName = appName;
+
+  public showError = false;
+
+  public checkUN() {
+    this.showError = this.username.length > 0 ? false : true;
+  }
 
   public cancel() {
     this.$router.back();
@@ -48,5 +88,4 @@ export default class Login extends Vue {
 }
 </script>
 
-<style>
-</style>
+<style></style>

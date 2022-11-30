@@ -5,7 +5,7 @@
         <div
           class="card-title d-flex justify-content-between align-items-center"
         >
-          <h4>Manage Users</h4>
+          <h4 class="text-primary">Manage Users</h4>
           <router-link :to="{ name: 'main-admin-users-create' }" tag="button">
             <button
               type="button"
@@ -77,7 +77,6 @@ import { dispatchGetUsers } from "@/store/admin/actions";
 
 @Component
 export default class AdminUsers extends Vue {
-
   get users() {
     return readAdminUsers(this.$store);
   }
