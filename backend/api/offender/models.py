@@ -56,4 +56,4 @@ class Offender(db.Document):
     
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.names[0].first_name} {self.names[0].last_name}"

@@ -12,7 +12,9 @@ services:
       - ./backend/.env
     depends_on:
       - db
-    restart: always
+    # restart: always
+    stdin_open: true
+    tty: true
 
 
   db:
