@@ -2,16 +2,10 @@
   <div class="container">
     <div class="card">
       <div class="card-body">
-        <div
-          class="card-title d-flex justify-content-between align-items-center"
-        >
+        <div class="card-title d-flex justify-content-between align-items-center">
           <h4 class="text-primary">Manage Users</h4>
           <router-link :to="{ name: 'main-admin-users-create' }" tag="button">
-            <button
-              type="button"
-              class="button is-primary"
-              style="max-width: fit-content; float: right"
-            >
+            <button type="button" class="button is-primary" style="max-width: fit-content; float: right">
               <i class="material-icons mr-1">add</i> Crate User
             </button>
           </router-link>

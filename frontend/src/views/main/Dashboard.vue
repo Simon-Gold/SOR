@@ -4,7 +4,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">
+            <h4 class="card-title text-primary">
               Users
               <small style="font-size: 50%"><i>via bootstrap css</i></small>
             </h4>
@@ -85,9 +85,7 @@ export default class Dashboard extends Vue {
   }
 
   public filterUserList() {
-    this.filterList = this.filterList.filter(
-      (u) => u.first_name.indexOf(this.firstName) > -1
-    );
+    this.filterList = this.filterList.filter((u) => u.first_name.indexOf(this.firstName) > -1);
 
     // filtering worked but the change was not reflected in the table
   }

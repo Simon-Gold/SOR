@@ -34,6 +34,7 @@ export default new Router({
           children: [
             {
               path: 'dashboard',
+              name: 'main-dashboard',
               component: () => import(/* webpackChunkName: "main-dashboard" */ './views/main/Dashboard.vue'),
             },
             {
@@ -43,16 +44,19 @@ export default new Router({
               children: [
                 {
                   path: 'view',
+                  name: 'main-profile-view',
                   component: () => import(
                     /* webpackChunkName: "main-profile" */ './views/main/profile/UserProfile.vue'),
                 },
                 {
                   path: 'edit',
+                  name: 'main-profile-edit',
                   component: () => import(
                     /* webpackChunkName: "main-profile-edit" */ './views/main/profile/UserProfileEdit.vue'),
                 },
                 {
                   path: 'password',
+                  name: 'main-profile-password',
                   component: () => import(
                     /* webpackChunkName: "main-profile-password" */ './views/main/profile/UserProfileEditPassword.vue'),
                 },
@@ -69,6 +73,7 @@ export default new Router({
                 },
                 {
                   path: 'users/all',
+                  name: 'main-admin-users',
                   component: () => import(
                     /* webpackChunkName: "main-admin-users" */ './views/main/admin/AdminUsers.vue'),
                 },

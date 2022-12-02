@@ -1,5 +1,5 @@
 <template>
-  <div class="container d-flex justify-content-center align-items-center">
+  <div class="container d-flex justify-content-center align-items-center" style="height: 99vh;">
     <div class="card" style="max-width: 400px !important">
       <header class="card-header" style="background-color: #00d1b2">
         <h4 class="card-header-title m-0" style="color: white">
@@ -32,17 +32,11 @@
               </form>
             </div>
             <div class="col-12">
-              <router-link to="/recover-password"
-                >Forgot your password?</router-link
-              >
+              <router-link to="/recover-password">Forgot your password?</router-link>
             </div>
             <div class="col-12 mt-2" v-if="loginError">
               <div class="alert alert-danger" role="alert">
-                <i
-                  class="material-icons mr-2"
-                  style="position: relative; top: 5px"
-                  >warning</i
-                >
+                <i class="material-icons mr-2" style="position: relative; top: 5px">warning</i>
                 <span>Incorrect email or password</span>
               </div>
             </div>
@@ -50,14 +44,7 @@
           <hr />
           <div class="row">
             <div class="col-12">
-              <button
-                style="float: right"
-                type="submit"
-                class="button is-link"
-                @click.prevent="submit"
-              >
-                Login
-              </button>
+              <button style="float: right" type="submit" class="button is-link" @click.prevent="submit">Login</button>
             </div>
           </div>
         </div>

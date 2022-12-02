@@ -22,9 +22,7 @@
                         required
                       />
                     </div>
-                    <p class="help is-danger" v-if="showFNError">
-                      Please enter first name
-                    </p>
+                    <p class="help is-danger" v-if="showFNError">Please enter first name</p>
                   </div>
                   <div class="field">
                     <label class="label">Last Name</label>
@@ -39,9 +37,7 @@
                         required
                       />
                     </div>
-                    <p class="help is-danger" v-if="showLNError">
-                      Please enter last name
-                    </p>
+                    <p class="help is-danger" v-if="showLNError">Please enter last name</p>
                   </div>
                   <div class="field">
                     <label class="label">Email</label>
@@ -58,10 +54,7 @@
                       <span class="icon is-small is-left">
                         <i class="material-icons">mail</i>
                       </span>
-                      <span
-                        class="icon is-small is-right"
-                        v-if="showEmailError"
-                      >
+                      <span class="icon is-small is-right" v-if="showEmailError">
                         <i class="material-icons">warning</i>
                       </span>
                     </div>
@@ -82,19 +75,13 @@
                         required
                       />
                     </div>
-                    <p class="help is-danger" v-if="showUNError">
-                      Please enter username
-                    </p>
+                    <p class="help is-danger" v-if="showUNError">Please enter username</p>
                   </div>
                   <div class="field">
                     <div class="control">
                       <label class="checkbox">
                         <input type="checkbox" v-model="isSuperuser" />
-                        User is superuser ({{
-                          isSuperuser
-                            ? "currently is a superuser"
-                            : "currently is not a superuser"
-                        }})
+                        User is superuser ({{ isSuperuser ? "currently is a superuser" : "currently is not a superuser" }})
                       </label>
                     </div>
                   </div>
@@ -102,11 +89,7 @@
                     <div class="control">
                       <label class="checkbox">
                         <input type="checkbox" v-model="isActive" />
-                        User is active ({{
-                          isActive
-                            ? "currently active"
-                            : "currently not active"
-                        }})
+                        User is active ({{ isActive ? "currently active" : "currently not active" }})
                       </label>
                     </div>
                   </div>
@@ -125,9 +108,7 @@
                         <i class="material-icons">warning</i>
                       </span>
                     </div>
-                    <p class="help is-danger" v-if="showP1Error">
-                      The password field is required
-                    </p>
+                    <p class="help is-danger" v-if="showP1Error">The password field is required</p>
                   </div>
                   <div class="field">
                     <label class="label">Confirm Password</label>
@@ -154,32 +135,13 @@
               <div class="row">
                 <div class="col-12 text-right">
                   <div class="buttons" style="justify-content: flex-end">
-                    <button
-                      type="button"
-                      class="button is-dark"
-                      @click="cancel"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      class="button is-warning"
-                      @click="reset"
-                    >
-                      Reset
-                    </button>
+                    <button type="button" class="button is-dark" @click="cancel">Cancel</button>
+                    <button type="button" class="button is-warning" @click="reset">Reset</button>
                     <button
                       type="submit"
                       class="button is-success"
                       @click="submit"
-                      :disabled="
-                        showEmailError ||
-                        showFNError ||
-                        showLNError ||
-                        showP1Error ||
-                        showP2Error ||
-                        showUNError
-                      "
+                      :disabled="showEmailError || showFNError || showLNError || showP1Error || showP2Error || showUNError"
                     >
                       Save
                     </button>
@@ -192,16 +154,11 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import {
-  IUserProfile,
-  IUserProfileUpdate,
-  IUserProfileCreate,
-} from "@/interfaces";
+import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from "@/interfaces";
 import { dispatchGetUsers, dispatchCreateUser } from "@/store/admin/actions";
 
 @Component

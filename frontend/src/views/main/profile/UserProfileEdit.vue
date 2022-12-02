@@ -18,9 +18,7 @@
                   placeholder="Enter First Name"
                 />
               </div>
-              <p class="help is-danger" v-if="showFNError">
-                Please enter first name
-              </p>
+              <p class="help is-danger" v-if="showFNError">Please enter first name</p>
             </div>
             <div class="field">
               <label class="label">Last Name</label>
@@ -34,9 +32,7 @@
                   placeholder="Enter last name"
                 />
               </div>
-              <p class="help is-danger" v-if="showLNError">
-                Please enter last name
-              </p>
+              <p class="help is-danger" v-if="showLNError">Please enter last name</p>
             </div>
             <div class="field">
               <label class="label">Email</label>
@@ -68,13 +64,7 @@
             <div class="buttons" style="justify-content: flex-end">
               <button class="button is-dark" @click="cancel">Cancel</button>
               <button class="button is-warning" @click="reset">Reset</button>
-              <button
-                class="button is-success"
-                @click="submit"
-                :disabled="showEmailError || showFNError || showLNError"
-              >
-                Save
-              </button>
+              <button class="button is-success" @click="submit" :disabled="showEmailError || showFNError || showLNError">Save</button>
             </div>
           </div>
         </div>
