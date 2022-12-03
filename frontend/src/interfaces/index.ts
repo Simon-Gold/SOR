@@ -7,6 +7,8 @@ export interface IUserProfile {
     last_name: string;
     username: string;
     id: string;
+    created_date: string;
+    updated_date: string;
 }
 
 export interface IUserProfileUpdate {

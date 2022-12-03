@@ -16,8 +16,9 @@
                     class="input"
                     id="searchByFName"
                     v-model="firstName"
-                    @change="filterUserList"
+                    @input="filter"
                     placeholder="Search By First Name"
+                    autocomplete="off"
                   />
                   <span class="icon is-small is-left">
                     <i class="material-icons">search</i>
@@ -27,7 +28,7 @@
             </div>
             <hr />
             <div class="row">
-              <div class="col">
+              <div class="col-12" v-if="showList">
                 <table class="table table-striped">
                   <thead>
                     <tr>
@@ -39,7 +40,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(user, index) in users">
+                    <tr v-for="(user, index) in filteredList">
                       <td>{{ index + 1 }}</td>
                       <td>{{ user.email }}</td>
                       <td>{{ user.first_name }}</td>
@@ -49,14 +50,18 @@
                   </tbody>
                 </table>
               </div>
+              <div class="col-12" v-else>
+                <div class="alert alert-info" role="alert">
+                  <i class="material-icons">info</i>
+                  <span>The user to display was not found.</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- <v-container fluid> </v-container> -->
 </template>
 
 <script lang="ts">
@@ -68,37 +73,32 @@ import { dispatchGetUsers } from "@/store/admin/actions";
 
 @Component
 export default class Dashboard extends Vue {
-  public firstName = "";
-  public filterList: any;
+  firstName = "";
+  users: IUserProfile[] = [];
+  filteredList: IUserProfile[] = [];
+  showList = false;
 
-  get users() {
-    return readAdminUsers(this.$store);
-  }
-
-  created() {
-    this.filterList = readAdminUsers(this.$store);
-    console.log(this.filterList);
-  }
-
-  public async mounted() {
+  public async created() {
     await dispatchGetUsers(this.$store);
+    this.users = readAdminUsers(this.$store);
+    this.filteredList = this.users.slice();
+    this.showList = this.filteredList.length > 0;
   }
 
-  public filterUserList() {
-    this.filterList = this.filterList.filter((u) => u.first_name.indexOf(this.firstName) > -1);
-
-    // filtering worked but the change was not reflected in the table
-  }
-
-  get greetedUser() {
-    const userProfile = readUserProfile(this.$store);
-    if (userProfile) {
-      if (userProfile.first_name || userProfile.last_name) {
-        return userProfile.first_name + " " + userProfile.last_name;
-      } else {
-        return userProfile.email;
-      }
+  filter() {
+    if (this.firstName) {
+      this.filteredList = this.users.filter((u) => u.first_name.toLowerCase().indexOf(this.firstName.toLowerCase()) > -1);
+    } else {
+      this.filteredList = this.users.slice();
     }
+    this.showList = this.filteredList.length > 0;
   }
 }
 </script>
+<style>
+.alert .material-icons {
+  position: relative;
+  top: 5px;
+  margin-right: 5px;
+}
+</style>
