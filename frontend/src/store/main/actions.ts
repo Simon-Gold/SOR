@@ -12,6 +12,7 @@ import {
     commitSetLogInError,
     commitSetToken,
     commitSetUserProfile,
+    commitSetOffenders
 } from './mutations';
 import { AppNotification, MainState } from './state';
 
@@ -154,6 +155,17 @@ export const actions = {
             commitAddNotification(context, { color: 'error', content: 'Error resetting password' });
         }
     },
+    async search(context: MainContext, payload: { query: string}) {
+        try {
+            const response = (await Promise.all([
+                api.search(context.state.token, payload.query),
+                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
+            commitSetOffenders(context, response.data);
+        } catch (error) {
+            await dispatchCheckApiError(context, error);
+        }
+    }
 };
 
 const { dispatch } = getStoreAccessors<MainState | any, State>('');
@@ -171,3 +183,4 @@ export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfil
 export const dispatchRemoveNotification = dispatch(actions.removeNotification);
 export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
 export const dispatchResetPassword = dispatch(actions.resetPassword);
+export const dispatchSearchOffenders = dispatch(actions.search);

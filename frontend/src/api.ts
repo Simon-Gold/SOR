@@ -1,3 +1,4 @@
+import { IOffenders } from './interfaces/index';
 import axios from 'axios';
 import { apiUrl } from '@/env';
 import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from './interfaces';
@@ -43,4 +44,7 @@ export const api = {
       token,
     });
   },
+  async search(token: string, query: string) {
+    return axios.get<IOffenders[]>(`${apiUrl}/api/v1/search/${query}`, authHeaders(token));
+  }
 };

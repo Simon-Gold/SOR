@@ -32,3 +32,17 @@ export interface IUserProfileCreate {
     is_active?: boolean;
     is_superuser?: boolean;
 }
+
+export interface IOffenders {
+    id: string;
+    state: string;
+    names: any[];
+    addresses: any[];
+    dob: any;
+    demographic: any;
+    is_deleted: boolean;
+    created_date: string;
+    updated_date: string;
+    age: number;
+    cases: any[];
+}

@@ -1,4 +1,4 @@
-import { IUserProfile } from '@/interfaces';
+import { IUserProfile, IOffenders } from '@/interfaces';
 import { MainState, AppNotification } from './state';
 import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '../state';
@@ -29,6 +29,9 @@ export const mutations = {
     removeNotification(state: MainState, payload: AppNotification) {
         state.notifications = state.notifications.filter((notification) => notification !== payload);
     },
+    setOffenders(state: MainState, payload: IOffenders[]) {
+        state.offenders = payload;
+    }
 };
 
 const {commit} = getStoreAccessors<MainState | any, State>('');
@@ -41,3 +44,4 @@ export const commitSetToken = commit(mutations.setToken);
 export const commitSetUserProfile = commit(mutations.setUserProfile);
 export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
+export const commitSetOffenders = commit(mutations.setOffenders);

@@ -70,6 +70,8 @@ import { Store } from "vuex";
 import { readUserProfile } from "@/store/main/getters";
 import { readAdminUsers } from "@/store/admin/getters";
 import { dispatchGetUsers } from "@/store/admin/actions";
+import { dispatchSearchOffenders } from "@/store/main/actions";
+import { IUserProfile } from "@/interfaces";
 
 @Component
 export default class Dashboard extends Vue {
@@ -83,6 +85,10 @@ export default class Dashboard extends Vue {
     this.users = readAdminUsers(this.$store);
     this.filteredList = this.users.slice();
     this.showList = this.filteredList.length > 0;
+
+    const data = await dispatchSearchOffenders(this.$store, { query: '?last=jo' });
+    console.log(data);
+    
   }
 
   filter() {
