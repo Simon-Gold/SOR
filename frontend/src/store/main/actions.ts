@@ -160,7 +160,7 @@ export const actions = {
             const response = (await Promise.all([
                 api.search(context.state.token, payload.query),
                 await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
-            ]))[0];
+            ]))[0];            
             commitSetOffenders(context, response.data);
         } catch (error) {
             await dispatchCheckApiError(context, error);

@@ -29,7 +29,7 @@ export const mutations = {
     removeNotification(state: MainState, payload: AppNotification) {
         state.notifications = state.notifications.filter((notification) => notification !== payload);
     },
-    setOffenders(state: MainState, payload: IOffenders[]) {
+    setOffenders(state: MainState, payload: IOffenders[]) {       
         state.offenders = payload;
     }
 };
