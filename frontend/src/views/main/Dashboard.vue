@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid pt-2">
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -10,13 +10,7 @@
                 <div class="field">
                   <label class="label">Search By Last Name</label>
                   <div class="control">
-                    <input
-                      type="text"
-                      class="input"
-                      id="searchByLName"
-                      v-model="lastName"
-                      autocomplete="off"
-                    />
+                    <input type="text" class="input" id="searchByLName" v-model="lastName" autocomplete="off" />
                   </div>
                 </div>
               </div>
@@ -24,13 +18,7 @@
                 <div class="field">
                   <label class="label">Search By First Name</label>
                   <div class="control">
-                    <input
-                      type="text"
-                      class="input"
-                      id="searchByFName"
-                      v-model="firstName"
-                      autocomplete="off"
-                    />
+                    <input type="text" class="input" id="searchByFName" v-model="firstName" autocomplete="off" />
                   </div>
                 </div>
               </div>
@@ -38,18 +26,12 @@
                 <div class="field">
                   <label class="label">Search By DOB</label>
                   <div class="control">
-                    <input
-                      type="date"
-                      class="input"
-                      id="searchByDob"
-                      v-model="dob"
-                      autocomplete="off"
-                    />
+                    <input type="date" class="input" id="searchByDob" v-model="dob" />
                   </div>
                 </div>
               </div>
               <div class="col d-flex align-items-end">
-                <button class="button is-link" @click="filterOffenders" style="max-width: 120px;" :disabled="!lastName">
+                <button class="button is-link" @click="filterOffenders" style="max-width: 120px" :disabled="!lastName">
                   <i class="material-icons">search</i> Search
                 </button>
               </div>
@@ -57,23 +39,33 @@
             <hr />
             <div class="row">
               <div class="col-12" v-if="showList">
-                <table class="table table-striped">
+                <table class="table table-striped table-hover">
                   <thead>
                     <tr>
-                      <th>#</th>
-                      <th>Email</th>
-                      <th>First Name</th>
-                      <th>Last Name</th>
-                      <th>Username</th>
+                      <th></th>
+                      <th>Offender Name</th>
+                      <th>Date of Birth</th>
+                      <th>Race</th>
+                      <th>Sex</th>
+                      <th>Height</th>
+                      <th>Weight</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(user, index) in filteredList">
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ user.email }}</td>
-                      <td>{{ user.first_name }}</td>
-                      <td>{{ user.last_name }}</td>
-                      <td>{{ user.username }}</td>
+                    <tr v-for="(offender, index) in offenders">
+                      <td>{{(index+1)}}</td>
+                      <td>{{ offender.names[0].first_name + " " + offender.names[0].middle + " " + offender.names[0].last_name }}</td>
+                      <td>{{ offender.dob.month + "/" + offender.dob.day + "/" + offender.dob.year }}</td>
+                      <td>{{ offender.demographic.race }}</td>
+                      <td>{{ offender.demographic.sex }}</td>
+                      <td>{{ offender.demographic.height }}</td>
+                      <td>{{ offender.demographic.weight }}</td>
+                      <td style="text-align: right;">
+                        <button class="button is-info is-small">
+                          <i class="material-icons">info</i> Go to Detail
+                        </button>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -81,7 +73,7 @@
               <div class="col-12" v-else>
                 <div class="alert alert-info" role="alert">
                   <i class="material-icons">info</i>
-                  <span>The user to display was not found.</span>
+                  <span>The offenders to display was not found.</span>
                 </div>
               </div>
             </div>
@@ -105,39 +97,30 @@ import { IOffenders, IUserProfile } from "@/interfaces";
 export default class Dashboard extends Vue {
   firstName = "";
   lastName = "";
-  dob?: Date;
+  dob = "";
 
-  users: IUserProfile[] = [];
-  filteredList: IUserProfile[] = [];
   showList = false;
 
-  offenders: IOffenders[] = [];
-
-  public async created() {
-    await dispatchGetUsers(this.$store);
-    this.users = readAdminUsers(this.$store);
-    this.filteredList = this.users.slice();
-    this.showList = this.filteredList.length > 0;
-  }
+  offenders: IOffenders[] | undefined;
 
   async filterOffenders() {
-    let query = '?last=' + this.lastName;
+    this.offenders = [];
+    let query = "?last=" + this.lastName;
     if (this.firstName) {
-      query += '&first=' + this.firstName;
+      query += "&first=" + this.firstName;
     }
     if (this.dob) {
-      const strDob = new Date(this.dob).toLocaleDateString('en-US');
-      query += '&dob=' + strDob;
+      const strDob = new Date(this.dob).toLocaleDateString("en-US");
+      query += "&dob=" + strDob;
     }
-
-    console.log(query);
-    
-    await dispatchSearchOffenders(this.$store, { query: query });
-    this.offenders = readOffenders(this.$store);
-    console.log(this.offenders);
-    
+    //await dispatchSearchOffenders(this.$store, { query: query });
+    // this.offenders = readOffenders(this.$store);
+    await dispatchSearchOffenders(this.$store, { query: query }).then((data) => {
+      debugger;
+      this.offenders = data;
+      this.showList = this.offenders !== undefined;
+    });
   }
-
 }
 </script>
 <style>
