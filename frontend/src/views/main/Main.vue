@@ -87,6 +87,14 @@ const routeGuardMain = async (to, from, next) => {
 export default class Main extends Vue {
   public appName = appName;
 
+  public beforeRouteEnter(to, from, next) {
+    routeGuardMain(to, from, next);
+  }
+
+  public beforeRouteUpdate(to, from, next) {
+    routeGuardMain(to, from, next);
+  }
+
   public get hasAdminAccess() {
     return readHasAdminAccess(this.$store);
   }
