@@ -20,7 +20,7 @@ export default class Offender extends Vue {
   created() {
     let data: any;
     if (sessionStorage.getItem("offender")) {
-      data = atob(sessionStorage.getItem("offender"));
+      data = atob( JSON.parse(sessionStorage.getItem('offender') || '{}'));
     } else {
       data = {};
     }
