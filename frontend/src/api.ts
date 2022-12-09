@@ -46,5 +46,9 @@ export const api = {
   },
   async search(token: string, query: string) {
     return axios.get<IOffenders[]>(`${apiUrl}/api/v1/search/${query}`, authHeaders(token));
+  },
+  async getOffenders(token: string) {
+    return axios.get<IOffenders[]>(`${apiUrl}/api/v1/offenders/`, authHeaders(token));
   }
+  
 };

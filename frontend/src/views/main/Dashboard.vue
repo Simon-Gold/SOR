@@ -15,7 +15,7 @@
                       class="input"
                       id="searchByLName"
                       v-model="lastName"
-                      @keyup.enter="filterOffenders"
+                      @keyup.enter="searchOffenders"
                       autocomplete="off"
                     />
                   </div>
@@ -30,7 +30,7 @@
                       class="input"
                       id="searchByFName"
                       v-model="firstName"
-                      @keyup.enter="filterOffenders"
+                      @keyup.enter="searchOffenders"
                       autocomplete="off"
                     />
                   </div>
@@ -40,12 +40,12 @@
                 <div class="field">
                   <label class="label">Search By DOB</label>
                   <div class="control">
-                    <input type="date" class="input" id="searchByDob" v-model="dob" @keyup.enter="filterOffenders" />
+                    <input type="date" class="input" id="searchByDob" v-model="dob" @keyup.enter="searchOffenders" />
                   </div>
                 </div>
               </div>
               <div class="col d-flex align-items-end">
-                <button class="button is-link" type="submit" @click="filterOffenders" style="max-width: 120px" :disabled="!lastName">
+                <button class="button is-link" type="submit" @click="searchOffenders" style="max-width: 120px" :disabled="!lastName">
                   <i class="material-icons">search</i> Search
                 </button>
               </div>
@@ -81,9 +81,6 @@
                       <td>{{ offender.demographic.height }}</td>
                       <td>{{ offender.demographic.weight }}</td>
                       <td style="text-align: right">
-                        <!-- <router-link :to="{ name: 'main-offender', params: { id: offender.id, query: query } }" tag="button">
-                          <button class="button is-info is-small"><i class="material-icons">info</i> Go to Detail</button>
-                        </router-link> -->
                         <button class="button is-info is-small" @click="setOffender(offender)">
                           <i class="material-icons">info</i> Go to Detail
                         </button>
@@ -110,7 +107,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import { Store } from "vuex";
 import { readOffenders } from "@/store/main/getters";
-import { dispatchSearchOffenders } from "@/store/main/actions";
+import { dispatchGetOffenders, dispatchSearchOffenders } from "@/store/main/actions";
 import { IOffenders } from "@/interfaces";
 
 @Component
@@ -126,7 +123,18 @@ export default class Dashboard extends Vue {
 
   query = "";
 
-  async filterOffenders() {
+  async created() {
+    this.offenders = [];
+    this.showList = false;
+    this.spinner = true;
+    await dispatchGetOffenders(this.$store).then((data) => {
+      this.spinner = false;
+      this.offenders = data;
+      this.showList = this.offenders !== undefined && this.offenders.length > 0;
+    });
+  }
+
+  async searchOffenders() {
     if (this.lastName) {
       this.offenders = [];
       this.showList = false;

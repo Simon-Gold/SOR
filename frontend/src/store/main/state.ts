@@ -14,5 +14,6 @@ export interface MainState {
     dashboardMiniDrawer: boolean;
     dashboardShowDrawer: boolean;
     notifications: AppNotification[];
+    searchedOffenders: IOffenders[];
     offenders: IOffenders[];
 }

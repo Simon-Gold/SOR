@@ -31,6 +31,9 @@ export const mutations = {
   setOffenders(state: MainState, payload: IOffenders[]) {
     state.offenders = payload;
   },
+  setSearchedOffenders(state: MainState, payload: IOffenders[]) {
+    state.searchedOffenders = payload;
+  }
 };
 
 const { commit } = getStoreAccessors<MainState | any, State>("");
@@ -44,3 +47,4 @@ export const commitSetUserProfile = commit(mutations.setUserProfile);
 export const commitAddNotification = commit(mutations.addNotification);
 export const commitRemoveNotification = commit(mutations.removeNotification);
 export const commitSetOffenders = commit(mutations.setOffenders);
+export const commitSetSearchedOffenders = commit(mutations.setSearchedOffenders);
