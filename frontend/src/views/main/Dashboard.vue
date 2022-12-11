@@ -10,14 +10,7 @@
                 <div class="field">
                   <label class="label">Last Name</label>
                   <div class="control">
-                    <input
-                      type="text"
-                      class="input"
-                      id="searchByLName"
-                      v-model="lastName"
-                      @keyup.enter="searchOffenders"
-                      autocomplete="off"
-                    />
+                    <input type="text" class="input" id="searchByLName" v-model="lastName" @input="searchOffenders" autocomplete="off" />
                   </div>
                 </div>
               </div>
@@ -32,6 +25,7 @@
                       v-model="firstName"
                       @keyup.enter="searchOffenders"
                       autocomplete="off"
+                      :disabled="!lastName"
                     />
                   </div>
                 </div>
@@ -40,7 +34,7 @@
                 <div class="field">
                   <label class="label">DOB</label>
                   <div class="control">
-                    <input type="date" class="input" id="searchByDob" v-model="dob" @keyup.enter="searchOffenders" />
+                    <input type="date" class="input" id="searchByDob" v-model="dob" @keyup.enter="searchOffenders" :disabled="!lastName" />
                   </div>
                 </div>
               </div>
@@ -58,39 +52,41 @@
                 </div>
               </div>
               <div class="col-12" v-if="showList">
-                <table class="table table-striped table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Offender</th>
-                      <th>Age</th>
-                      <th>Aliases</th>
-                      <th>Address</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(offender, index) in tempOffenders">
-                      <td style="vertical-align: middle; width: 130px">
-                        <button class="button is-info is-small" @click="setOffender(offender)">
-                          <i class="material-icons mr-1">logout</i> Go Detail
-                        </button>
-                      </td>
-                      <td>
-                        <span class="d-block" v-if="offender.names[0].middle">{{ offender.names[0].middle }},</span>
-                        <span class="d-block">{{ offender.names[0].last_name + " " + offender.names[0].first_name }}</span>
-                      </td>
-                      <td>{{ offender.age }}</td>
-                      <td>
-                        <span class="d-block" v-if="offender.names.length > 1" v-for="name in offender.names.slice(1)">
-                          {{ name.first_name + " " + name.middle + " " + name.last_name }},
-                        </span>
-                      </td>
-                      <td>
-                        <span class="d-block" v-for="address in offender.addresses"> {{ address.line }}, </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div class="box" style="overflow: auto; height: 780px">
+                  <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th class="col-3" v-for="header in tableHeader">
+                          <span style="width: 98%">{{ header.displayName }}</span>
+                          <i class="fa-solid mt-1" :class="header.class" @click="sort(header.propName)"></i>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(offender, index) in tempOffenders">
+                        <td style="vertical-align: middle; width: 130px">
+                          <button class="button is-info is-small" @click="setOffender(offender)">
+                            <i class="material-icons mr-1">logout</i> Go Detail
+                          </button>
+                        </td>
+                        <td>
+                          <span class="d-block">{{ offender.names[0].last_name }},</span>
+                          <span class="d-block">{{ offender.names[0].first_name + " " + offender.names[0].middle }}</span>
+                        </td>
+                        <td>{{ offender.age }}</td>
+                        <td>
+                          <span class="d-block" v-if="offender.names.length > 1" v-for="name in offender.names.slice(1)">
+                            {{ name.first_name + " " + name.middle + " " + name.last_name }},
+                          </span>
+                        </td>
+                        <td>
+                          <span class="d-block" v-for="address in offender.addresses"> {{ address.line }}, </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
               <div class="col-12" v-if="!showList && !spinner">
                 <div class="alert alert-info" role="alert">
@@ -144,12 +140,23 @@ export default class Dashboard extends Vue {
   tempOffenders?: IOffenders[];
 
   query = "";
-  offenderPerPage = 3;
+  offenderPerPage = 6;
   currentPage = 1;
   totalPage? = 0;
   totalOffender? = 0;
 
+  tableHeader: { displayName: string; propName: string; sortType: string; class: string }[] = [
+    { displayName: "Offender", propName: "last_name", sortType: "default", class: "fa-sort" },
+    { displayName: "Age", propName: "age", sortType: "default", class: "fa-sort" },
+    { displayName: "Aliases", propName: "names", sortType: "default", class: "fa-sort" },
+    { displayName: "Address", propName: "addresses", sortType: "default", class: "fa-sort" },
+  ];
+
   async created() {
+    await this.getOffenders();
+  }
+
+  async getOffenders() {
     this.offenders = [];
     this.tempOffenders = [];
     this.showList = false;
@@ -161,7 +168,36 @@ export default class Dashboard extends Vue {
       this.totalOffender = this.offenders?.length;
       this.totalPage = Math.ceil((this.totalOffender ? this.totalOffender : 0) / this.offenderPerPage);
       this.filter();
+      console.log(this.offenders);
     });
+  }
+
+  async searchOffenders() {
+    if (this.lastName) {
+      this.offenders = [];
+      this.showList = false;
+      this.spinner = true;
+      this.query = "";
+      this.query = "?last=" + this.lastName;
+      if (this.firstName) {
+        this.query += "&first=" + this.firstName;
+      }
+      if (this.dob) {
+        const strDob = new Date(this.dob).toLocaleDateString("en-US");
+        this.query += "&dob=" + strDob;
+      }
+
+      await dispatchSearchOffenders(this.$store, { query: this.query }).then((data) => {
+        this.spinner = false;
+        this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+        this.showList = this.offenders !== undefined && this.offenders.length > 0;
+        this.totalOffender = this.offenders?.length;
+        this.totalPage = Math.ceil((this.totalOffender ? this.totalOffender : 0) / this.offenderPerPage);
+        this.filter();
+      });
+    } else {
+      await this.getOffenders();
+    }
   }
 
   prevPage() {
@@ -187,35 +223,70 @@ export default class Dashboard extends Vue {
     });
   }
 
-  async searchOffenders() {
-    if (this.lastName) {
-      this.offenders = [];
-      this.showList = false;
-      this.spinner = true;
-      this.query = "";
-      this.query = "?last=" + this.lastName;
-      if (this.firstName) {
-        this.query += "&first=" + this.firstName;
+  sort(pName: string) {
+    let sortType = "";
+    this.tableHeader.forEach((th) => {
+      if (pName === th.propName) {
+        if (th.sortType === "default") {
+          th.sortType = "up";
+          th.class = "fa-sort-up";
+        } else if (th.sortType === "up") {
+          th.sortType = "down";
+          th.class = "fa-sort-down";
+        } else {
+          th.sortType = "default";
+          th.class = "fa-sort";
+        }
+        sortType = th.sortType;
+      } else {
+        th.sortType = "default";
+        th.class = "fa-sort";
       }
-      if (this.dob) {
-        const strDob = new Date(this.dob).toLocaleDateString("en-US");
-        this.query += "&dob=" + strDob;
-      }
+    });
 
-      await dispatchSearchOffenders(this.$store, { query: this.query }).then((data) => {
-        this.spinner = false;
-        this.offenders = data;
-        this.showList = this.offenders !== undefined && this.offenders.length > 0;
-      });
-    } else {
-      alert("The last name is required");
+    this.offenders = this.offenders?.sort((a, b) => a.names[0].last_name.localeCompare(b.names[0].last_name));
+
+    switch (pName) {
+      case "last_name": {
+        if (sortType === "up") this.offenders = this.offenders?.sort((a, b) => b.names[0].last_name.localeCompare(a.names[0].last_name));
+        else if (sortType === "down")
+          this.offenders = this.offenders?.sort((a, b) => a.names[0].last_name.localeCompare(b.names[0].last_name));
+        else this.offenders = this.offenders?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+        break;
+      }
+      case "age": {
+        if (sortType === "up") this.offenders = this.offenders?.sort((a, b) => b.age - a.age);
+        else if (sortType === "down") this.offenders = this.offenders?.sort((a, b) => a.age - b.age);
+        else this.offenders = this.offenders?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+        break;
+      }
+      // this area will edit when data modified
+      case "names": {
+        if (sortType === "up") this.offenders = this.offenders?.sort((a, b) => b.names[0].last_name.localeCompare(a.names[0].last_name));
+        else if (sortType === "down")
+          this.offenders = this.offenders?.sort((a, b) => a.names[0].last_name.localeCompare(b.names[0].last_name));
+        else this.offenders = this.offenders?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+        break;
+      }
+      case "addresses": {
+        if (sortType === "up") this.offenders = this.offenders?.sort((a, b) => b.addresses[0].line.localeCompare(a.addresses[0].line));
+        else if (sortType === "down")
+          this.offenders = this.offenders?.sort((a, b) => a.addresses[0].line.localeCompare(b.addresses[0].line));
+        else this.offenders = this.offenders?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+        break;
+      }
+      default:
+        break;
     }
+
+    this.filter();
   }
 
   setOffender(data: IOffenders) {
     let hashData = btoa(JSON.stringify(data));
     sessionStorage.setItem("offender", hashData);
-    this.$router.push({ name: "main-offender" });
+    let routeData = this.$router.resolve({ name: "main-offender" });
+    window.open(routeData.href, "_blank");
   }
 }
 </script>
@@ -224,5 +295,16 @@ export default class Dashboard extends Vue {
   position: relative;
   top: 5px;
   margin-right: 5px;
+}
+.box .table thead th {
+  border-width: 0px 1px 2px;
+  color: #fff;
+  background-color: #333;
+}
+
+.box .table thead th i {
+  float: right;
+  margin-top: 4px;
+  cursor: pointer;
 }
 </style>
