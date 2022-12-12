@@ -12,6 +12,7 @@ const defaultState: MainState = {
   dashboardShowDrawer: true,
   notifications: [],
   offenders: [],
+  searchedOffenders: []
 };
 
 export const mainModule = {
