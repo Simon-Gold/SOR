@@ -15,7 +15,7 @@ def verify_password(username, password):
             user = User.objects(username=username).first()
             if user is None:
                 user = User.objects(email=username).first()
-            if user and user.check_password(password):
+            if user and user.verify_password(password):
                 return user
     except NotFound:
         raise ValueError("username or password is wrong!")

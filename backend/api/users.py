@@ -16,7 +16,6 @@ users_schema = UserSchema(many=True)
 update_user_schema = UpdateUserSchema(partial=True)
 
 
-
 @users.route('/users/', methods=['POST'])
 @body(user_schema)
 @response(user_schema, 201)
@@ -29,7 +28,7 @@ def create_user(args):
     user.set_password(password)
     user.save()
     return user
-    
+
 
 @users.route('/users/', methods=['GET'])
 @authenticate(token_auth)
@@ -56,6 +55,7 @@ def get(id):
     """Retrieve a user by id"""
     return User.objects(pk=id).first() or abort(404)
 
+
 @users.route("/users/<string:id>", methods=["DELETE"])
 @authenticate(token_auth)
 @other_responses({404: "User Not Found"})
@@ -74,17 +74,20 @@ def delete_user(id):
         return abort(404)
 
 
-@users.route('/users/<string:id>', methods=['PUT'])
+@users.route('/users/<string:id>', methods=['PUT', 'PATCH'])
 @authenticate(token_auth)
 @body(update_user_schema)
 @response(user_schema)
 def update_user(data, id):
     """Edit other user information"""
     user = User.objects.get(id=id)
-    if 'password' in data and ('old_password' not in data or
-                               not user.verify_password(data['old_password'])):
+    password = data.pop("password")
+    old_password = data.pop("old_password")
+    if (password and (not old_password or not user.verify_password(old_password))):
         abort(400)
     user.update(**data)
+    if password:
+        user.set_password(password)
     user.save()
     user.reload()
     return user
