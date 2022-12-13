@@ -37,7 +37,7 @@ class User(db.Document):
     def set_password(self, password):
         self.password = generate_password_hash(password)
     
-    def check_password(self, raw_password):
+    def verify_password(self, raw_password):
         return check_password_hash(self.password, raw_password)
 
     def generate_auth_token(self):
