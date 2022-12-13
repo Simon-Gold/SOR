@@ -56,6 +56,23 @@ def get(id):
     """Retrieve a user by id"""
     return User.objects(pk=id).first() or abort(404)
 
+@users.route("/users/<string:id>", methods=["DELETE"])
+@authenticate(token_auth)
+@other_responses({404: "User Not Found"})
+def delete_user(id):
+    """Delete an user by id"""
+    try:
+        user = User.objects.get(pk=id)
+        user.delete()
+        msg = {
+            "message": "User is deleted successfully",
+            "id": id
+        }
+        response = jsonify(msg)
+        return response
+    except User.DoesNotExist:
+        return abort(404)
+
 
 @users.route('/users/<string:id>', methods=['PUT'])
 @authenticate(token_auth)
