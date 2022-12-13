@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, abort
 from apifairy import authenticate, body, response, other_responses
 from apifairy.exceptions import ValidationError
 from mongoengine.queryset.visitor import Q
+from werkzeug.exceptions import NotFound
 # internals
 from api.offender.schemas import OffenderSchema
 from api.auth import token_auth
@@ -55,19 +56,22 @@ def get_offenders():
     """Get all offenders"""
     PAGE = 1
     PAGE_LIMIT = 10
-    page = int(request.args.get("page")) or PAGE
-    limit = int(request.args.get("limit")) or PAGE_LIMIT
-    po = Offender.objects.paginate(page=page, per_page=limit)
-    response = jsonify({
-        "next": f"{request.base_url}?page={po.next_num}&limit={po.per_page}",
-        "prev": f"{request.base_url}?page={po.prev_num}&limit={po.per_page}",
-        "current_page": po.page,
-        "limit": po.per_page,
-        "total_items": po.total,
-        "total_pages": po.pages,
-        "items": offenders_schema.dump(po.items),
-    })
-    return response
+    page = request.args.get("page") or PAGE
+    limit = request.args.get("limit") or PAGE_LIMIT
+    try:
+        po = Offender.objects.paginate(page=int(page), per_page=int(limit))
+        response = jsonify({
+            "next": f"{request.base_url}?page={po.next_num}&limit={po.per_page}",
+            "prev": f"{request.base_url}?page={po.prev_num}&limit={po.per_page}" if po.has_prev else None,
+            "current_page": po.page,
+            "limit": po.per_page,
+            "total_items": po.total,
+            "total_pages": po.pages,
+            "items": offenders_schema.dump(po.items),
+        })
+        return response
+    except NotFound:
+        return abort(404)
 
 
 @offenders.route("/offenders/<string:id>", methods=["GET"])
