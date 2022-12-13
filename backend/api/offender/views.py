@@ -52,7 +52,19 @@ def search_offenders():
 @response(offenders_schema,)
 @other_responses({400: "Bad Request!"})
 def get_offenders():
+    """Get all offenders"""
     return Offender.objects
+
+@offenders.route("/offenders/<string:id>", methods=["GET"])
+@authenticate(token_auth)
+@response(offender_schema,)
+@other_responses({404: "Offender Not Found"})
+def get_offender(id):
+    """Retrieve an offender by id"""
+    offender = Offender.objects.get(pk=id)
+    return offender or abort(404)
+
+
 
 @offenders.route("/offenders/", methods=["POST"])
 @authenticate(token_auth)
@@ -60,6 +72,7 @@ def get_offenders():
 @response(offender_schema, 201)
 @other_responses({400: "Bad Request!"})
 def create_offender(args):
+    """Create an offender"""
     payload = request.get_json()
     cases_payload = payload.pop("cases", [])
     cases_objects = []
