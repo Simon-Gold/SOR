@@ -20,7 +20,7 @@ class User(db.Document):
     full_name = db.StringField(max_length=60)# TODO will remove
     first_name = db.StringField(max_length=60)
     last_name = db.StringField(max_length=60)
-    email = db.EmailField()
+    email = db.EmailField(unique=True)
     is_superuser = db.BooleanField(default=False)
     is_active = db.BooleanField(default=True)
 

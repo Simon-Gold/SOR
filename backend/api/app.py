@@ -3,10 +3,11 @@ from flask_cors import CORS
 from flask_mail import Mail
 from flask_marshmallow import Marshmallow
 from apifairy import APIFairy
+from flask_mongoengine import MongoEngine
 # internals
 from config import Config
 
-
+db = MongoEngine()
 cors = CORS()
 mail = Mail()
 marsh = Marshmallow()
@@ -17,16 +18,16 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # extensions
-    
-
-    from api import models
-    models.db.init_app(app)
+    db.init_app(app)
 
     # api documentation
     apifairy.init_app(app)
 
     # serialization/deserialization Marshmellow
     marsh.init_app(app)
+    from bson import ObjectId
+    marsh.Schema.TYPE_MAPPING[ObjectId] = marsh.String
+
     # Mail
     mail.init_app(app)
     # CORS
@@ -37,10 +38,10 @@ def create_app(config_class=Config):
     API_URL_PREFIX = "/api/v1"
     from api.errors import errors
     app.register_blueprint(errors)
-    from api.tokens import tokens
-    app.register_blueprint(tokens, url_prefix=API_URL_PREFIX)
-    from api.users import users
-    app.register_blueprint(users, url_prefix=API_URL_PREFIX)
+    from api.auth.views import bp_auth
+    app.register_blueprint(bp_auth, url_prefix=API_URL_PREFIX)
+    from api.user.views import bp_user
+    app.register_blueprint(bp_user, url_prefix=API_URL_PREFIX)
     from api.offender.views import offenders
     app.register_blueprint(offenders, url_prefix=API_URL_PREFIX)
 

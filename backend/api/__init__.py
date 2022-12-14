@@ -125,4 +125,4 @@ containing a detailed list of validation errors found in the submitted request:
 ```
 """  # noqa: E501
 
-from api.app import create_app, marsh# noqa: F401
+from api.app import create_app, marsh, db # noqa: F401

@@ -5,7 +5,7 @@ from mongoengine.queryset.visitor import Q
 from werkzeug.exceptions import NotFound
 # internals
 from api.offender.schemas import OffenderSchema
-from api.auth import token_auth
+from api.auth.handlers import token_auth
 from .models import Offender, OffenderCase
 
 # blue print

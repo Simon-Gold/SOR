@@ -1,22 +1,23 @@
 from flask import Blueprint, jsonify, request, abort
 from apifairy import authenticate, body, response, other_responses
 from apifairy.exceptions import ValidationError
+from werkzeug.exceptions import NotFound
 
 # internals
 from api.models import User
-from api.schemas import UserSchema, UpdateUserSchema, EmptySchema
-from api.auth import token_auth
+from api.user.schemas import UserSchema, UpdateUserSchema
+from api.auth.handlers import token_auth
 
 
 # globals
-users = Blueprint('users', __name__)
+bp_user = Blueprint('users', __name__)
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 update_user_schema = UpdateUserSchema(partial=True)
 
 
-@users.route('/users/', methods=['POST'])
+@bp_user.route('/users/', methods=['POST'])
 @body(user_schema)
 @response(user_schema, 201)
 @other_responses({400: "Bad Request!"})
@@ -30,16 +31,32 @@ def create_user(args):
     return user
 
 
-@users.route('/users/', methods=['GET'])
+@bp_user.route('/users/', methods=['GET'])
 @authenticate(token_auth)
-@response(users_schema)
+# @response(users_schema)
 def get_users():
     """Get all users"""
-    users = User.objects
-    return users
+    PAGE = 1
+    PAGE_LIMIT = 10
+    page = request.args.get("page") or PAGE
+    limit = request.args.get("limit") or PAGE_LIMIT
+    try:
+        po = User.objects.paginate(page=int(page), per_page=int(limit))
+        response = jsonify({
+            "next": f"{request.base_url}?page={po.next_num}&limit={po.per_page}",
+            "prev": f"{request.base_url}?page={po.prev_num}&limit={po.per_page}" if po.has_prev else None,
+            "current_page": po.page,
+            "limit": po.per_page,
+            "total_items": po.total,
+            "total_pages": po.pages,
+            "items": users_schema.dump(po.items),
+        })
+        return response
+    except NotFound:
+        return abort(404)
 
 
-@users.route('/users/me', methods=['GET'])
+@bp_user.route('/users/me', methods=['GET'])
 @authenticate(token_auth)
 @response(user_schema)
 def me():
@@ -47,7 +64,7 @@ def me():
     return token_auth.current_user()
 
 
-@users.route('/users/<string:id>', methods=['GET'])
+@bp_user.route('/users/<string:id>', methods=['GET'])
 @authenticate(token_auth)
 @response(user_schema)
 @other_responses({404: 'User not found'})
@@ -56,7 +73,7 @@ def get(id):
     return User.objects(pk=id).first() or abort(404)
 
 
-@users.route("/users/<string:id>", methods=["DELETE"])
+@bp_user.route("/users/<string:id>", methods=["DELETE"])
 @authenticate(token_auth)
 @other_responses({404: "User Not Found"})
 def delete_user(id):
@@ -74,7 +91,7 @@ def delete_user(id):
         return abort(404)
 
 
-@users.route('/users/<string:id>', methods=['PUT', 'PATCH'])
+@bp_user.route('/users/<string:id>', methods=['PUT', 'PATCH'])
 @authenticate(token_auth)
 @body(update_user_schema)
 @response(user_schema)
@@ -93,7 +110,7 @@ def update_user(data, id):
     return user
 
 
-@users.route('/users/me', methods=['PUT'])
+@bp_user.route('/users/me', methods=['PUT'])
 @authenticate(token_auth)
 @body(update_user_schema)
 @response(user_schema)
