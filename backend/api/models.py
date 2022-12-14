@@ -20,7 +20,7 @@ class User(db.Document):
     full_name = db.StringField(max_length=60)# TODO will remove
     first_name = db.StringField(max_length=60)
     last_name = db.StringField(max_length=60)
-    email = db.EmailField()
+    email = db.EmailField(unique=True)
     is_superuser = db.BooleanField(default=False)
     is_active = db.BooleanField(default=True)
 
@@ -37,7 +37,7 @@ class User(db.Document):
     def set_password(self, password):
         self.password = generate_password_hash(password)
     
-    def check_password(self, raw_password):
+    def verify_password(self, raw_password):
         return check_password_hash(self.password, raw_password)
 
     def generate_auth_token(self):

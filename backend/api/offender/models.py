@@ -1,6 +1,6 @@
 from datetime import datetime
 # internals
-from api.models import db
+from api import db
 
 
 class OffenderCharge(db.EmbeddedDocument):

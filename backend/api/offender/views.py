@@ -2,9 +2,10 @@ from flask import Blueprint, jsonify, request, abort
 from apifairy import authenticate, body, response, other_responses
 from apifairy.exceptions import ValidationError
 from mongoengine.queryset.visitor import Q
-#internals
+from werkzeug.exceptions import NotFound
+# internals
 from api.offender.schemas import OffenderSchema
-from api.auth import token_auth
+from api.auth.handlers import token_auth
 from .models import Offender, OffenderCase
 
 # blue print
@@ -34,11 +35,11 @@ def search_offenders():
     dob = request.args.get("dob")
     q_dob = Q()
     if dob:
-        month,day,year = dob.split("/")
+        month, day, year = dob.split("/")
         q_dob = (Q(dob__year=int(year)) &
-                Q(dob__month=int(month)) &
-                Q(dob__day=int(day)))
-    # filter all
+                 Q(dob__month=int(month)) &
+                 Q(dob__day=int(day)))
+    #  filter all
     results = Offender.objects.filter(
         q_lastname &
         q_firstname &
@@ -47,12 +48,41 @@ def search_offenders():
 
     return results
 
+
 @offenders.route("/offenders/", methods=["GET"])
 @authenticate(token_auth)
-@response(offenders_schema,)
 @other_responses({400: "Bad Request!"})
 def get_offenders():
-    return Offender.objects
+    """Get all offenders"""
+    PAGE = 1
+    PAGE_LIMIT = 10
+    page = request.args.get("page") or PAGE
+    limit = request.args.get("limit") or PAGE_LIMIT
+    try:
+        po = Offender.objects.paginate(page=int(page), per_page=int(limit))
+        response = jsonify({
+            "next": f"{request.base_url}?page={po.next_num}&limit={po.per_page}",
+            "prev": f"{request.base_url}?page={po.prev_num}&limit={po.per_page}" if po.has_prev else None,
+            "current_page": po.page,
+            "limit": po.per_page,
+            "total_items": po.total,
+            "total_pages": po.pages,
+            "items": offenders_schema.dump(po.items),
+        })
+        return response
+    except NotFound:
+        return abort(404)
+
+
+@offenders.route("/offenders/<string:id>", methods=["GET"])
+@authenticate(token_auth)
+@response(offender_schema,)
+@other_responses({404: "Offender Not Found"})
+def get_offender(id):
+    """Retrieve an offender by id"""
+    offender = Offender.objects.get(pk=id)
+    return offender or abort(404)
+
 
 @offenders.route("/offenders/", methods=["POST"])
 @authenticate(token_auth)
@@ -60,6 +90,7 @@ def get_offenders():
 @response(offender_schema, 201)
 @other_responses({400: "Bad Request!"})
 def create_offender(args):
+    """Create an offender"""
     payload = request.get_json()
     cases_payload = payload.pop("cases", [])
     cases_objects = []
