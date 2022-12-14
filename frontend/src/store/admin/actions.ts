@@ -17,6 +17,8 @@ export const actions = {
             if (response) {
                 commitSetUsers(context, response.data);
             }
+
+            return response.data;
         } catch (error) {
             await dispatchCheckApiError(context, error);
         }

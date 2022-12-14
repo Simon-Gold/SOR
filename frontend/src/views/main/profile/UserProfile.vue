@@ -21,7 +21,7 @@
           <router-link to="/main/profile/edit" tag="button">
             <button class="button is-primary mr-1">Edit</button>
           </router-link>
-          <router-link to="/main/profile/edit" tag="button">
+          <router-link to="/main/profile/password" tag="button">
             <button class="button is-link">Change Password</button>
           </router-link>
         </div>

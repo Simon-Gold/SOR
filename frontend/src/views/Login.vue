@@ -14,7 +14,7 @@
                 <div class="field">
                   <label class="label">Login</label>
                   <div class="control has-icons-left">
-                    <input type="text" class="input" v-model="email" />
+                    <input type="text" class="input" v-model="email" placeholder="Username or email"/>
                     <span class="icon is-small is-left">
                       <i class="material-icons">person</i>
                     </span>

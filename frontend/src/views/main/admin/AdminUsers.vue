@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <div class="card">
       <div class="card-body">
         <div class="card-title d-flex justify-content-between align-items-center">
@@ -33,51 +33,46 @@
         </div>
         <hr />
         <div class="row">
+          <div class="col-12 text-center" v-show="spinner">
+            <div class="spinner-border" style="width: 3rem; height: 3rem" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
           <div class="col-12" v-if="showList">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Email</th>
-                  <th>Username</th>
-                  <th>Created Date</th>
-                  <th>Updated Date</th>
-                  <th>İs Active</th>
-                  <th>İs Superuser</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="user in filteredList">
-                  <td>{{ user.first_name }}</td>
-                  <td>{{ user.last_name }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.username }}</td>
-                  <td>{{ formatDate(user.created_date) }}</td>
-                  <td>{{ formatDate(user.updated_date) }}</td>
-                  <td>
-                    <i v-if="user.is_active" class="material-icons">check</i>
-                  </td>
-                  <td>
-                    <i v-if="user.is_superuser" class="material-icons">check</i>
-                  </td>
-                  <td>
-                    <router-link
-                      :to="{
-                        name: 'main-admin-users-edit',
-                        params: { id: user.id },
-                      }"
-                      tag="button"
-                    >
-                      <button class="button is-info is-small">
-                        <i class="material-icons">edit</i>
-                      </button>
-                    </router-link>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="box table-responsive">
+              <table class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>İs Active</th>
+                    <th>İs Superuser</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="user in filteredList">
+                    <td style="width: 66px">
+                      <router-link :to="{ name: 'main-admin-users-edit', params: { id: user.id } }" tag="button">
+                        <button class="button is-info is-small">
+                          <i class="material-icons">edit</i>
+                        </button>
+                      </router-link>
+                    </td>
+                    <td>{{ user.first_name + " " + user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>
+                      <i v-if="user.is_active" class="material-icons">check</i>
+                    </td>
+                    <td>
+                      <i v-if="user.is_superuser" class="material-icons">check</i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
           <div class="col-12" v-else>
             <div class="alert alert-info" role="alert">
@@ -101,30 +96,50 @@ import { dispatchGetUsers } from "@/store/admin/actions";
 @Component
 export default class AdminUsers extends Vue {
   firstName = "";
-  users: IUserProfile[] = [];
-  filteredList: IUserProfile[] = [];
+  users?: IUserProfile[];
+  filteredList?: IUserProfile[];
   showList = false;
+  spinner = false;
 
-  public async created() {
-    await dispatchGetUsers(this.$store);
-    this.users = readAdminUsers(this.$store);
-    this.filteredList = this.users.slice();
-    this.showList = this.filteredList.length > 0;
+  width = window.innerWidth;
+
+  async created() {
+    window.addEventListener("resize", this.resizeHandler);
+    await this.getUsers();
+  }
+
+  destroyed() {
+    window.removeEventListener("resize", this.resizeHandler);
+  }
+
+  resizeHandler(e) {
+    this.width = e.target.innerWidth;
+  }
+  async getUsers() {
+    this.showList = false;
+    this.spinner = true;
+    await dispatchGetUsers(this.$store).then((data) => {
+      this.spinner = false;
+      this.showList = true;
+      this.users = data;
+      this.filteredList = this.users?.slice();
+      this.showList = this.filteredList !== undefined && this.filteredList.length > 0;
+    });
   }
 
   filter() {
     if (this.firstName) {
-      this.filteredList = this.users.filter((u) => u.first_name.toLowerCase().indexOf(this.firstName.toLowerCase()) > -1);
+      this.filteredList = this.users?.filter((u) => u.first_name.toLowerCase().indexOf(this.firstName.toLowerCase()) > -1);
     } else {
-      this.filteredList = this.users.slice();
+      this.filteredList = this.users?.slice();
     }
-    this.showList = this.filteredList.length > 0;
+    this.showList = this.filteredList !== undefined && this.filteredList.length > 0;
   }
 
   formatDate(value: any) {
     if (value) {
       const date = new Date(value);
-      return date.toLocaleDateString("en-US") + " " + date.toLocaleTimeString("en-US");
+      return date.toLocaleDateString("en-US");
     }
   }
 }
@@ -134,5 +149,19 @@ export default class AdminUsers extends Vue {
   position: relative;
   top: 5px;
   margin-right: 5px;
+}
+button.is-small {
+  padding: 0 7px;
+}
+.box .table thead th {
+  border-width: 0px 1px 2px;
+  color: #fff;
+  background-color: #333;
+}
+
+.box .table thead th i {
+  float: right;
+  margin-top: 4px;
+  cursor: pointer;
 }
 </style>
