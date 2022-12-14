@@ -17,7 +17,7 @@ class Config:
         {
             "db": os.environ.get("MONGODB_DBNAME","db_sor"),
             "host": os.environ.get("MONGODB_HOST","localhost"),
-            "port": int(os.environ.get("MONGODB_PORT")) or 27017,
+            "port": int(os.environ.get("MONGODB_PORT", 27017)),
             "alias": "default",
             "username": os.environ.get("MONGODB_USERNAME","developer"),
             "password": os.environ.get("MONGODB_PASSWORD","developer")

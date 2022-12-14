@@ -1,15 +1,12 @@
 from flask import Blueprint, request, abort, current_app, url_for
 from werkzeug.http import dump_cookie
-from apifairy import authenticate, body, response, other_responses
-
-from api.auth import basic_auth
-from api.email import send_email
-from api.models import User, Token
-from api.schemas import TokenSchema, PasswordResetRequestSchema, \
-    PasswordResetSchema, EmptySchema
+from apifairy import authenticate
+# internals
+from api.auth.handlers import basic_auth
+from api.auth.schemas import TokenSchema
 
 
-tokens = Blueprint('tokens', __name__)
+bp_auth = Blueprint('auth', __name__)
 token_schema = TokenSchema()
 
 
@@ -21,7 +18,7 @@ def token_response(token):
             samesite = 'none' if not current_app.debug else 'lax'
         headers['Set-Cookie'] = dump_cookie(
             'refresh_token', token.refresh_token,
-            path=url_for('tokens.create_token'), secure=not current_app.debug,
+            path=url_for('auth.create_token'), secure=not current_app.debug,
             httponly=True, samesite=samesite)
     return {
         'access_token': token.access_token,
@@ -30,7 +27,7 @@ def token_response(token):
     }, 200, headers
 
 
-@tokens.route('/tokens/', methods=['POST'])
+@bp_auth.route('/tokens/', methods=['POST'])
 @authenticate(basic_auth)
 # @response(token_schema)
 # @other_responses({401: 'Invalid username or password'})
