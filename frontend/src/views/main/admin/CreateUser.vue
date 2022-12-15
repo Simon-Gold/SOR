@@ -231,7 +231,7 @@ export default class CreateUser extends Vue {
   }
 
   public async mounted() {
-    await dispatchGetUsers(this.$store);
+    // await dispatchGetUsers(this.$store);
     this.reset();
   }
 
@@ -255,38 +255,37 @@ export default class CreateUser extends Vue {
   }
 
   public cancel() {
-    this.$router.back();
+    // this.$router.back();
+    this.$router.push("/main/admin/users/all");
   }
 
   public async submit() {
-    if (await this.$validator.validateAll()) {
-      const updatedProfile: IUserProfileCreate = {
-        email: this.email,
-        first_name: this.firstName,
-        last_name: this.lastName,
-        username: this.username,
-      };
-      if (this.fullName) {
-        updatedProfile.full_name = this.fullName;
-      }
-      if (this.firstName) {
-        updatedProfile.first_name = this.firstName;
-      }
-      if (this.lastName) {
-        updatedProfile.last_name = this.lastName;
-      }
-      if (this.username) {
-        updatedProfile.username = this.username;
-      }
-      if (this.email) {
-        updatedProfile.email = this.email;
-      }
-      updatedProfile.is_active = this.isActive;
-      updatedProfile.is_superuser = this.isSuperuser;
-      updatedProfile.password = this.password1;
-      await dispatchCreateUser(this.$store, updatedProfile);
-      this.$router.push("/main/admin/users");
+    const updatedProfile: IUserProfileCreate = {
+      email: this.email,
+      first_name: this.firstName,
+      last_name: this.lastName,
+      username: this.username,
+    };
+    if (this.fullName) {
+      updatedProfile.full_name = this.fullName;
     }
+    if (this.firstName) {
+      updatedProfile.first_name = this.firstName;
+    }
+    if (this.lastName) {
+      updatedProfile.last_name = this.lastName;
+    }
+    if (this.username) {
+      updatedProfile.username = this.username;
+    }
+    if (this.email) {
+      updatedProfile.email = this.email;
+    }
+    updatedProfile.is_active = this.isActive;
+    updatedProfile.is_superuser = this.isSuperuser;
+    updatedProfile.password = this.password1;
+    await dispatchCreateUser(this.$store, updatedProfile);
+    this.$router.push("/main/admin/users/all");
   }
 }
 </script>

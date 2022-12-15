@@ -1,7 +1,7 @@
-import { IOffenders } from './interfaces/index';
-import axios from 'axios';
-import { apiUrl } from '@/env';
-import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from './interfaces';
+import { IOffenders, IOffenderPageModel, IUserPageModel } from "./interfaces/index";
+import axios from "axios";
+import { apiUrl } from "@/env";
+import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from "./interfaces";
 
 function authHeaders(token: string) {
   return {
@@ -13,12 +13,16 @@ function authHeaders(token: string) {
 
 export const api = {
   async logInGetToken(username: string, password: string) {
-    return axios.post(`${apiUrl}/api/v1/tokens/`, {}, {
+    return axios.post(
+      `${apiUrl}/api/v1/tokens/`,
+      {},
+      {
         auth: {
           username: username,
-          password: password
-        }
-      });
+          password: password,
+        },
+      }
+    );
   },
   async getMe(token: string) {
     return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/me`, authHeaders(token));
@@ -26,14 +30,21 @@ export const api = {
   async updateMe(token: string, data: IUserProfileUpdate) {
     return axios.put<IUserProfile>(`${apiUrl}/api/v1/users/me`, data, authHeaders(token));
   },
-  async getUsers(token: string) {
-    return axios.get<IUserProfile[]>(`${apiUrl}/api/v1/users/`, authHeaders(token));
+  async getUsers(token: string, url: string) {
+    url = url ? url : `${apiUrl}/api/v1/users/`;
+    return axios.get<IUserPageModel>(url, authHeaders(token));
+  },
+  async getUser(token: string, userId: string) {
+    return axios.get<IUserProfile>(`${apiUrl}/api/v1/users/${userId}`, authHeaders(token))
   },
   async updateUser(token: string, userId: string, data: IUserProfileUpdate) {
     return axios.put(`${apiUrl}/api/v1/users/${userId}`, data, authHeaders(token));
   },
   async createUser(token: string, data: IUserProfileCreate) {
     return axios.post(`${apiUrl}/api/v1/users/`, data, authHeaders(token));
+  },
+  async deleteUser(token: string, userId: string) {
+    return axios.delete(`${apiUrl}/api/v1/users/${userId}`, authHeaders(token))
   },
   async passwordRecovery(email: string) {
     return axios.post(`${apiUrl}/api/v1/password-recovery/${email}`);
@@ -47,8 +58,8 @@ export const api = {
   async search(token: string, query: string) {
     return axios.get<IOffenders[]>(`${apiUrl}/api/v1/search/${query}`, authHeaders(token));
   },
-  async getOffenders(token: string) {
-    return axios.get<IOffenders[]>(`${apiUrl}/api/v1/offenders/`, authHeaders(token));
-  }
-  
+  async getOffenders(token: string, url: string) {
+    url = url ? url : `${apiUrl}/api/v1/offenders/`;
+    return axios.get<IOffenderPageModel>(url, authHeaders(token));
+  },
 };

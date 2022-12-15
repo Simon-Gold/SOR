@@ -167,7 +167,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import { IUserProfile, IUserProfileUpdate } from "@/interfaces";
-import { dispatchGetUsers, dispatchUpdateUser } from "@/store/admin/actions";
+import { dispatchGetUser, dispatchUpdateUser } from "@/store/admin/actions";
 import { readAdminOneUser } from "@/store/admin/getters";
 
 @Component
@@ -193,6 +193,8 @@ export default class EditUser extends Vue {
   public showP1Error: boolean = false;
   public showP2Error: boolean = false;
   public passErrorMessage: string = "";
+
+  user?: IUserProfile;
 
   checkFN() {
     this.showFNError = this.firstName.length > 0 ? false : true;
@@ -238,8 +240,10 @@ export default class EditUser extends Vue {
     }
   }
 
-  public async mounted() {
-    await dispatchGetUsers(this.$store);
+  public async created() {
+    await dispatchGetUser(this.$store, { id: this.$router.currentRoute.params.id }).then((data) => {
+      this.user = data;
+    });
     this.reset();
   }
 
@@ -265,7 +269,7 @@ export default class EditUser extends Vue {
   }
 
   public cancel() {
-    this.$router.back();
+    this.$router.push({ name: "main-admin-users" });
   }
 
   public async submit() {
@@ -292,12 +296,8 @@ export default class EditUser extends Vue {
         id: this.user!.id,
         user: updatedProfile,
       });
-      this.$router.push("/main/admin/users");
+      this.$router.push({ name: "main-admin-users" });
     }
-  }
-
-  get user() {
-    return readAdminOneUser(this.$store)(this.$router.currentRoute.params.id);
   }
 }
 </script>

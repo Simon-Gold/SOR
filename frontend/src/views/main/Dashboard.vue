@@ -112,7 +112,7 @@
               </div>
               <div class="col-12" v-if="showList">
                 <div class="box" :class="{ 'p-0': width <= 725 }" style="overflow: auto; max-height: 750px; min-height: 560px">
-                  <div class="card mb-1" v-if="width <= 725" v-for="(offender, index) in tempOffenders">
+                  <div class="card mb-1" v-if="width <= 725" v-for="(offender, index) in offenders">
                     <div class="card-body">
                       <h5 class="card-title text-info">
                         {{ offender.names[0].first_name + " " + offender.names[0].middle + " " + offender.names[0].last_name }}
@@ -138,7 +138,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="(offender, index) in tempOffenders">
+                      <tr v-for="(offender, index) in offenders">
                         <td>
                           <button type="button" class="btn btn-link" @click="setOffender(offender)">
                             {{ offender.names[0].first_name + " " + offender.names[0].middle + " " + offender.names[0].last_name }}
@@ -161,18 +161,18 @@
               </div>
             </div>
             <hr />
-            <div class="row">
+            <div class="row" v-if="!isSearched">
               <div class="col-12">
                 <nav aria-label="Page navigation example">
                   <ul class="pagination justify-content-center">
                     <li class="page-item" :class="{ disabled: currentPage == 1 }">
-                      <a class="page-link" @click="prevPage">Previous</a>
+                      <a class="page-link" @click="goPrev()">Previous</a>
                     </li>
-                    <li class="page-item" v-for="page in totalPage" :class="{ active: page == currentPage }">
+                    <li class="page-item" v-for="page in totalPages" :class="{ active: page == currentPage }">
                       <a class="page-link" @click="setCurrentPage(page)">{{ page }}</a>
                     </li>
-                    <li class="page-item" :class="{ disabled: currentPage == totalPage }">
-                      <a class="page-link" @click="nextPage">Next</a>
+                    <li class="page-item" :class="{ disabled: currentPage == totalPages }">
+                      <a class="page-link" @click="goNext()">Next</a>
                     </li>
                   </ul>
                 </nav>
@@ -190,8 +190,9 @@ import { Component, Vue } from "vue-property-decorator";
 import { Store } from "vuex";
 import { readOffenders } from "@/store/main/getters";
 import { dispatchGetOffenders, dispatchSearchOffenders } from "@/store/main/actions";
-import { IOffenders } from "@/interfaces";
+import { IOffenders, IOffenderPageModel } from "@/interfaces";
 import { ref } from "vue";
+import { apiUrl } from "@/env";
 
 @Component
 export default class Dashboard extends Vue {
@@ -203,13 +204,15 @@ export default class Dashboard extends Vue {
   isSearched = false;
 
   offenders?: IOffenders[];
-  tempOffenders?: IOffenders[];
 
   query = "";
   offenderPerPage = 6;
-  currentPage = 1;
-  totalPage? = 0;
-  totalOffender? = 0;
+  totalPages? = 0;
+  totalItems? = 0;
+  currentPage? = 1;
+  pageLimit = 10;
+  nextUrl?: string;
+  prevUrl?: string;
 
   tableHeader: { displayName: string; propName: string; sortType: string; class: string }[] = [
     { displayName: "Offender", propName: "first_name", sortType: "default", class: "fa-sort" },
@@ -221,7 +224,7 @@ export default class Dashboard extends Vue {
 
   async created() {
     window.addEventListener("resize", this.resizeHandler);
-    await this.getOffenders();
+    await this.getOffenders("");
   }
 
   destroyed() {
@@ -232,19 +235,37 @@ export default class Dashboard extends Vue {
     this.width = e.target.innerWidth;
   }
 
-  async getOffenders() {
+  async getOffenders(url: string) {
+    let payload = { url: url };
     this.offenders = [];
-    this.tempOffenders = [];
     this.showList = false;
     this.spinner = true;
-    await dispatchGetOffenders(this.$store).then((data) => {
+    await dispatchGetOffenders(this.$store, payload).then((data) => {
       this.spinner = false;
-      this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+      this.offenders = data?.items?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
       this.showList = this.offenders !== undefined && this.offenders.length > 0;
-      this.totalOffender = this.offenders?.length;
-      this.totalPage = Math.ceil((this.totalOffender ? this.totalOffender : 0) / this.offenderPerPage);
-      this.filter();
+      this.totalItems = data?.total_items;
+      this.totalPages = data?.total_pages;
+      this.nextUrl = data?.next;
+      this.prevUrl = data?.prev;
+      this.currentPage = data?.current_page;
     });
+  }
+
+  async goNext() {
+    let next = this.nextUrl ? this.nextUrl : "";
+    await this.getOffenders(next);
+  }
+
+  async goPrev() {
+    let prev = this.prevUrl ? this.prevUrl : "";
+    await this.getOffenders(prev);
+  }
+
+  async setCurrentPage(page: number) {
+    let query = "?page=" + page;
+    let url = `${apiUrl}/api/v1/offenders/${query}`;
+    await this.getOffenders(url);
   }
 
   async searchOffenders() {
@@ -267,44 +288,20 @@ export default class Dashboard extends Vue {
         this.spinner = false;
         this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
         this.showList = this.offenders !== undefined && this.offenders.length > 0;
-        this.totalOffender = this.offenders?.length;
-        this.totalPage = Math.ceil((this.totalOffender ? this.totalOffender : 0) / this.offenderPerPage);
-        this.filter();
+        this.totalItems = this.offenders?.length;
+        this.totalPages = Math.ceil((this.totalItems ? this.totalItems : 0) / this.offenderPerPage);
       });
     } else {
-      await this.getOffenders();
+      await this.getOffenders("");
     }
   }
 
-  prevPage() {
-    this.currentPage--;
-    this.filter();
-  }
-
-  nextPage() {
-    this.currentPage++;
-    this.filter();
-  }
-
-  setCurrentPage(pageNumber: number) {
-    this.currentPage = pageNumber;
-    this.filter();
-  }
-
-  filter() {
-    this.tempOffenders = this.offenders?.filter((row, index) => {
-      let start = (this.currentPage - 1) * this.offenderPerPage;
-      let end = this.currentPage * this.offenderPerPage;
-      if (index >= start && index < end) return true;
-    });
-  }
-
-  clearFilter() {
+  async clearFilter() {
     if (this.isSearched) {
       this.lastName = "";
       this.firstName = "";
       this.dob = "";
-      this.getOffenders();
+      await this.getOffenders("");
     } else {
       this.lastName = "";
       this.firstName = "";
@@ -370,8 +367,6 @@ export default class Dashboard extends Vue {
       default:
         break;
     }
-
-    this.filter();
   }
 
   setOffender(data: IOffenders) {

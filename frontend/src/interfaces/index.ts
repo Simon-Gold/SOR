@@ -46,3 +46,23 @@ export interface IOffenders {
     age: number;
     cases: any[];
 }
+
+export interface IOffenderPageModel {
+    current_page: number;
+    items: IOffenders[];
+    limit: number;
+    next: string;
+    prev: string;
+    total_items: number;
+    total_pages: number;
+}
+
+export interface IUserPageModel {
+    current_page: number;
+    items: IUserProfile[];
+    limit: number;
+    next: string;
+    prev: string;
+    total_items: number;
+    total_pages: number;
+}

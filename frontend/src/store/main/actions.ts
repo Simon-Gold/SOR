@@ -177,15 +177,15 @@ export const actions = {
       await dispatchCheckApiError(context, error);
     }
   },
-  async actiongGetOffenders(context: MainContext) {
+  async actiongGetOffenders(context: MainContext, payload: { url: string }) {
     try {
       const response = (
         await Promise.all([
-          api.getOffenders(context.state.token),
+          api.getOffenders(context.state.token, payload.url),
           await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
         ])
       )[0];
-      commitSetOffenders(context, response.data);
+      commitSetOffenders(context, response.data.items);
 
       return response.data;
     } catch (error) {
