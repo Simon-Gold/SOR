@@ -68,7 +68,7 @@ def me():
 @authenticate(token_auth)
 @response(user_schema)
 @other_responses({404: 'User not found'})
-def get(id):
+def get_user(id):
     """Retrieve a user by id"""
     return User.objects(pk=id).first() or abort(404)
 
@@ -97,30 +97,43 @@ def delete_user(id):
 @response(user_schema)
 def update_user(data, id):
     """Edit other user information"""
-    user = User.objects.get(id=id)
-    password = data.pop("password")
-    old_password = data.pop("old_password")
-    if (password and (not old_password or not user.verify_password(old_password))):
-        abort(400)
-    user.update(**data)
-    if password:
-        user.set_password(password)
-    user.save()
-    user.reload()
-    return user
+    try:
+        user = User.objects.get(id=id)
+        password = data.pop("password", None)
+        old_password = data.pop("old_password", None)
+        if (password and (not old_password or not user.verify_password(old_password))):
+            abort(400)
+        if data:
+            user.update(**data)
+        if password:
+            user.set_password(password)
+    except Exception as e:
+        raise e
+    else:
+        user.save()
+        user.reload()
+        return user
 
 
-@bp_user.route('/users/me', methods=['PUT'])
+@bp_user.route('/users/me', methods=['PUT', 'PATCH'])
 @authenticate(token_auth)
 @body(update_user_schema)
 @response(user_schema)
 def update_me(data):
     """Edit user information"""
-    user = token_auth.current_user()
-    if 'password' in data and ('old_password' not in data or
-                               not user.verify_password(data['old_password'])):
-        abort(400)
-    user.update(**data)
-    user.save()
-    user.reload()
-    return user
+    try:
+        user = token_auth.current_user()
+        password = data.pop("password", None)
+        old_password = data.pop("old_password", None)
+        if (password and (not old_password or not user.verify_password(old_password))):
+            abort(400)
+        if data:
+            user.update(**data)
+        if password:
+            user.set_password(password)
+    except Exception as e:
+        raise e
+    else:
+        user.save()
+        user.reload()
+        return user

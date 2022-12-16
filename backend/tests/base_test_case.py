@@ -37,6 +37,9 @@ class BaseTestCase(unittest.TestCase):
         self.user = User(username="test", email="test@example.com")
         self.user.set_password("test")
         self.user.save()
+        self.admin = User(username="admin", email="admin@example.com")
+        self.admin.set_password("admin")
+        self.admin.save()
     
     def setUp(self):
         self.app = create_app(self.config)

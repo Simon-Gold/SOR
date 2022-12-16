@@ -22,7 +22,7 @@ class DateOfBirth(ma.Schema):
     month = ma.Integer(strict=True, required=True, 
     validate=[validate.Range(min=1, max=12, error="Month must be between 1,12")]
     )
-    day = ma.Integer(strict=True, required=True, 
+    day = ma.Integer(strict=True, required=False,
     validate=[validate.Range(min=1, max=31, error="Day must be between 1,31")]
     )
 
@@ -46,10 +46,10 @@ class OffenderSchema(ma.Schema):
 
     id = ma.String(unique=True, dump_only=True)
     state = ma.String()
-    names = ma.List(ma.Nested(OffenderNameSchema))
-    addresses = ma.List(ma.Nested(OffenderAddressSchema))
-    dob = ma.Nested(DateOfBirth)
-    demographic = ma.Nested(DemographicSchema)
+    names = ma.List(ma.Nested(OffenderNameSchema), required=True)
+    addresses = ma.List(ma.Nested(OffenderAddressSchema), required=True)
+    dob = ma.Nested(DateOfBirth, required=True)
+    demographic = ma.Nested(DemographicSchema, required=True)
     is_deleted = ma.Boolean()
     created_date = ma.DateTime(dump_only=True)
     updated_date = ma.DateTime(dump_only=True)

@@ -16,7 +16,7 @@ offenders_schema = OffenderSchema(many=True)
 
 
 @offenders.route("/search/", methods=["GET"])
-# @authenticate(token_auth)
+@authenticate(token_auth)
 @response(offenders_schema,)
 @other_responses({400: "Bad Request!"})
 def search_offenders():
@@ -37,7 +37,7 @@ def search_offenders():
     if dob:
         month, day, year = dob.split("/")
         q_dob = (Q(dob__year=int(year)) &
-                 Q(dob__month=int(month)) &
+                 Q(dob__month=int(month)) |
                  Q(dob__day=int(day)))
     #  filter all
     results = Offender.objects.filter(
@@ -80,8 +80,11 @@ def get_offenders():
 @other_responses({404: "Offender Not Found"})
 def get_offender(id):
     """Retrieve an offender by id"""
-    offender = Offender.objects.get(pk=id)
-    return offender or abort(404)
+    try:
+        offender = Offender.objects.get(pk=id)
+        return offender
+    except Offender.DoesNotExist:
+        return abort(404)
 
 
 @offenders.route("/offenders/", methods=["POST"])
