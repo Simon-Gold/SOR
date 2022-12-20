@@ -1,11 +1,32 @@
 <template>
-  <div class="container-fluid pt-2">
+  <div class="container-fluid">
+    <div class="row my-2">
+      <div class="col">
+        <div class="input-group input-group-lg">
+          <button class="btn btn-primary" type="button" id="button-addon" :disabled="!searchText" @click="search()">
+            <i class="fa-solid fa-magnifying-glass"></i> Search
+          </button>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Exp: Smith John 15/05/1980 in:SOR"
+            aria-label="Search Offender"
+            aria-describedby="button-addon"
+            v-model="searchText"
+            @keyup.enter="search()"
+          />
+          <button class="btn btn-secondary" type="button" id="button-addon" @click="clearFilter()" v-show="searchText">
+            <i class="fa-solid fa-xmark"></i> Clear Filter
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title text-primary" v-if="width > 725"><i class="material-icons">search</i> Search Offender</h4>
-            <div class="row mb-3" v-if="width <= 725">
+            <!-- <h4 class="card-title text-primary" v-if="width > 725"><i class="material-icons">search</i> Search Offender</h4>
+             <div class="row mb-3" v-if="width <= 725">
               <div class="accordion" id="searchAccordion">
                 <div class="accordion-item">
                   <h2 class="accordion-header" id="headingOne">
@@ -103,7 +124,7 @@
                 </div>
               </div>
             </div>
-            <hr />
+            <hr /> -->
             <div class="row">
               <div class="col-12 text-center" v-show="spinner">
                 <div class="spinner-border" style="width: 3rem; height: 3rem" role="status">
@@ -222,6 +243,8 @@ export default class Dashboard extends Vue {
 
   width = window.innerWidth;
 
+  searchText = "";
+
   async created() {
     window.addEventListener("resize", this.resizeHandler);
     await this.getOffenders("");
@@ -268,6 +291,33 @@ export default class Dashboard extends Vue {
     await this.getOffenders(url);
   }
 
+  async search() {
+    if (this.searchText) {
+      let split = this.searchText.trim().replace(/\s\s+/g, " ").split(" ");
+      this.isSearched = true;
+      this.offenders = [];
+      this.showList = false;
+      this.spinner = true;
+      this.query = "";
+      this.query = "?last=" + split[0];
+      if (split[1]) {
+        this.query += "&first=" + split[1];
+        if (split[2]) {
+          this.query += "&dob=" + split[2];
+        }
+      }
+      await dispatchSearchOffenders(this.$store, { query: this.query }).then((data) => {
+        this.spinner = false;
+        this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+        this.showList = this.offenders !== undefined && this.offenders.length > 0;
+        this.totalItems = this.offenders?.length;
+        this.totalPages = Math.ceil((this.totalItems ? this.totalItems : 0) / this.offenderPerPage);
+      });
+    } else {
+      this.getOffenders("");
+    }
+  }
+
   async searchOffenders() {
     if (this.lastName) {
       this.isSearched = true;
@@ -301,11 +351,13 @@ export default class Dashboard extends Vue {
       this.lastName = "";
       this.firstName = "";
       this.dob = "";
+      this.searchText = "";
       await this.getOffenders("");
     } else {
       this.lastName = "";
       this.firstName = "";
       this.dob = "";
+      this.searchText = "";
       this.isSearched = false;
     }
   }
