@@ -3,14 +3,29 @@
     <!-- header -->
     <header class="header body-pd" id="header">
       <div class="header_toggle"><i class="fa-solid fa-chevron-left" id="header-toggle" @click="menuClick"></i></div>
-      <form role="search" style="width: 90%">
-        <div class="control has-icons-left">
-          <input class="input" type="search" placeholder="Search Offender" aria-label="Search" />
-          <span class="icon is-small is-left">
-            <i class="material-icons">search</i>
-          </span>
-        </div>
-      </form>
+      <div class="input-group" style="width: 90%">
+        <span class="input-group-text">
+          <i class="material-icons">search</i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Search Offender (Exp: Smith John 15/05/1980 in:SOR)"
+          aria-label="Search Offender"
+          aria-describedby="button-addon"
+          v-model="searchText"
+          @keypress.enter="$emit('sendSearchText', searchText)"
+        />
+        <button
+          class="button is-danger"
+          type="button"
+          id="button-addon"
+          @click="$emit('clearSearchText'), (searchText = '')"
+          v-show="searchText"
+        >
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
       <button
         class="button is-outlined dropdown-toggle"
         role="button"
@@ -58,7 +73,7 @@
       <nav class="nav">
         <div>
           <a href="#" class="nav_logo">
-            <i class="fa-solid fa-layer-group nav_logo-icon"></i> <span class="nav_logo-name">Project Name</span>
+            <i class="fa-solid fa-layer-group nav_logo-icon"></i> <span class="nav_logo-name">ProjectSOR</span>
           </a>
           <div class="nav_list">
             <router-link class="nav_link active" :to="{ name: 'main-dashboard' }">
@@ -74,7 +89,7 @@
       </nav>
     </div>
     <!-- main content -->
-    <div class="height-100 bg-light" style="margin-top: 5rem">
+    <div class="height-100" style="margin-top: 5rem">
       <router-view></router-view>
     </div>
   </div>
@@ -97,7 +112,7 @@ const routeGuardMain = async (to, from, next) => {
 @Component
 export default class Main extends Vue {
   public appName = appName;
-
+  public searchText = "";
   width = window.innerWidth;
 
   created() {
@@ -197,6 +212,14 @@ export default class Main extends Vue {
     height: 100% !important;
   }
 }
+
+.input-group-text {
+  border: none;
+  background: white;
+  padding: 0.375rem 0.5rem;
+}
+/*  */
+
 @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
 
 :root {
@@ -227,6 +250,10 @@ export default class Main extends Vue {
 
 a {
   text-decoration: none;
+}
+
+h4 {
+  color: var(--first-color);
 }
 
 .header {
