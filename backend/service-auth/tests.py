@@ -53,6 +53,7 @@ class BaseTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         #  drop previous existing data
+        db.connection["default"].drop_database("test_db_auth")
         self.create_user()
         self.client = self.app.test_client()
 
