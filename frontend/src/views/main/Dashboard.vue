@@ -90,7 +90,7 @@ import { readOffenders } from "@/store/main/getters";
 import { dispatchGetOffenders, dispatchSearchOffenders } from "@/store/main/actions";
 import { IOffenders, IOffenderPageModel } from "@/interfaces";
 import { ref } from "vue";
-import { apiUrl } from "@/env";
+import { apiAuthURL, apiSorURL } from "@/env";
 
 @Component
 export default class Dashboard extends Vue {
@@ -168,7 +168,7 @@ export default class Dashboard extends Vue {
 
   async setCurrentPage(page: number) {
     let query = "?page=" + page;
-    let url = `${apiUrl}/api/v1/offenders/${query}`;
+    let url = `${apiSorURL}/api/v1/offenders/${query}`;
     await this.getOffenders(url);
   }
 

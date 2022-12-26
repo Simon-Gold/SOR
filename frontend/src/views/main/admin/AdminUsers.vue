@@ -148,7 +148,7 @@ import { Store } from "vuex";
 import { IUserPageModel, IUserProfile } from "@/interfaces";
 import { readAdminUsers } from "@/store/admin/getters";
 import { dispatchGetUsers, dispatchDeleteUser } from "@/store/admin/actions";
-import { apiUrl } from "@/env";
+import { apiAuthURL, apiSorURL } from "@/env";
 
 @Component
 export default class AdminUsers extends Vue {
@@ -209,7 +209,7 @@ export default class AdminUsers extends Vue {
 
   async setCurrentPage(page: number) {
     let query = "?page=" + page;
-    let url = `${apiUrl}/api/v1/offenders/${query}`;
+    let url = `${apiSorURL}/api/v1/offenders/${query}`;
     await this.getUsers(url);
   }
 

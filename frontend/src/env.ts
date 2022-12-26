@@ -1,14 +1,17 @@
 const env = process.env.VUE_APP_ENV;
 
-let envApiUrl = '';
+let envApiAuthURL = '';
+let envApiSorURL = '';
 
 if (env === 'production') {
-  envApiUrl = `https://${process.env.VUE_APP_API_URL_PROD}`;
+  envApiAuthURL = `https://${process.env.VUE_APP_API_AUTH_URL_PROD}`;
 } else if (env === 'staging') {
-  envApiUrl = `https://${process.env.VUE_APP_API_URL_STAG}`;
+  envApiAuthURL = `https://${process.env.VUE_APP_API_AUTH_URL_STAG}`;
 } else {
-  envApiUrl = `http://${process.env.VUE_APP_API_URL_DEV}`;
+  envApiAuthURL = `http://${process.env.VUE_APP_API_AUTH_URL_DEV}`;
+  envApiSorURL = `http://${process.env.VUE_APP_API_SOR_URL_DEV}`;
 }
 
-export const apiUrl = envApiUrl;
+export const apiAuthURL = envApiAuthURL;
+export const apiSorURL = envApiSorURL;
 export const appName = process.env.VUE_APP_NAME;
