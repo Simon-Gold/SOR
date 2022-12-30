@@ -2,29 +2,31 @@
   <div id="body-pd" class="body body-pd">
     <!-- header -->
     <header class="header body-pd" id="header">
-      <div class="header_toggle"><i class="fa-solid fa-chevron-left" id="header-toggle" @click="menuClick"></i></div>
+      <div class="header_toggle">
+        <i class="fa-solid fa-chevron-left" id="header-toggle" @click="menuClick"></i>
+      </div>
       <div class="input-group" style="width: 90%">
-        <span class="input-group-text">
-          <i class="material-icons">search</i>
-        </span>
+          <span class="input-group-text">
+            <i class="material-icons">search</i>
+          </span>
         <input
           type="text"
-          class="form-control"
-          placeholder="Search Offender (Exp: Smith John 15/05/1980 in:SOR)"
+          class="form-control text-small"
+          placeholder="Search Offender (Exp: Lastname Firstname MM/dd/YYY in:SOR)"
           aria-label="Search Offender"
           aria-describedby="button-addon"
           v-model="searchText"
           @keypress.enter="$emit('sendSearchText', searchText)"
         />
-        <button
-          class="button is-danger"
-          type="button"
-          id="button-addon"
-          @click="$emit('clearSearchText'), (searchText = '')"
-          v-show="searchText"
-        >
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+          <button
+            class="input-group-text button is-danger"
+            type="button"
+            id="button-addon"
+            @click="$emit('clearSearchText'), (searchText = '')"
+            v-show="searchText"
+            >
+            <i class="fa-solid fa-xmark p-1"></i>
+          </button>
       </div>
       <button
         class="button is-outlined dropdown-toggle"
@@ -117,6 +119,16 @@ export default class Main extends Vue {
 
   created() {
     window.addEventListener("resize", this.resizeHandler);
+    // handle key press as event listener [1]
+    // window.addEventListener('keyup', this.previous);
+  }
+  previous(event_keypress) {
+    // check key code [2]
+    // console.log(event_keypress);
+  }
+  beforeDestroy() {
+    // remove listener [3]
+    // window.removeEventListener('keyup', this.previous);
   }
 
   destroyed() {
@@ -412,4 +424,7 @@ h4 {
     padding-left: calc(var(--nav-width) + 188px);
   }
 }
+/* input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield-cancel-button;
+  } */
 </style>

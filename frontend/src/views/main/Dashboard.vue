@@ -55,7 +55,18 @@
           </table>
         </div>
       </div>
-      <div class="col-12" v-if="!showList && !spinner">
+      <div class="col-12 my-2" v-if="isError && msgError">
+        <div class="card alert alert-danger">
+          <div class="card-header">
+            <i class="material-icons">error</i>
+            {{ msgError["message"] }}
+          </div>
+          <div class="card-body">
+            {{ msgError["description"] }}
+          </div>
+        </div>
+      </div>
+      <div class="col-12" v-else-if="!showList && !spinner">
         <div class="alert alert-info" role="alert">
           <i class="material-icons">info</i>
           <span>The offenders to display was not found.</span>
@@ -100,6 +111,8 @@ export default class Dashboard extends Vue {
   showList = false;
   spinner = false;
   isSearched = false;
+  isError = false;
+  msgError = "";
 
   offenders?: IOffenders[];
 
@@ -194,12 +207,23 @@ export default class Dashboard extends Vue {
           this.query += "&dob=" + split[2];
         }
       }
-      await dispatchSearchOffenders(this.$store, { query: this.query }).then((data) => {
+      await dispatchSearchOffenders(this.$store, { query: this.query })
+      .then((data) => {
         this.spinner = false;
         this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
         this.showList = this.offenders !== undefined && this.offenders.length > 0;
         this.totalItems = this.offenders?.length;
         this.totalPages = Math.ceil((this.totalItems ? this.totalItems : 0) / this.offenderPerPage);
+        this.isError = false;
+      })
+      .catch(error =>{
+        const error_data = error.response.data;
+        if(error_data.code){
+          this.isError = true;
+          this.msgError = error_data;
+          this.showList = false;
+          this.spinner = false;
+        }
       });
     } else {
       this.getOffenders("");
@@ -213,6 +237,7 @@ export default class Dashboard extends Vue {
       this.dob = "";
       this.searchText = "";
       this.isSearched = false;
+      this.isError = false;
       await this.getOffenders("");
     } else {
       this.lastName = "";

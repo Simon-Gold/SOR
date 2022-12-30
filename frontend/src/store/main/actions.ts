@@ -174,7 +174,7 @@ export const actions = {
 
       return response.data;
     } catch (error) {
-      await dispatchCheckApiError(context, error);
+      throw error;
     }
   },
   async actiongGetOffenders(context: MainContext, payload: { url: string }) {

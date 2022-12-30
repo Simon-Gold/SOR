@@ -1,3 +1,4 @@
+import datetime
 from flask import Blueprint, jsonify, request, abort
 from apifairy import authenticate, body, response, other_responses
 from apifairy.exceptions import ValidationError
@@ -23,7 +24,7 @@ offenders_schema = OffenderSchema(many=True)
 def search_offenders():
     lastname = request.args.get("last")
     if not lastname:
-        raise ValueError("Lastname is required!")
+        raise abort(code=400, description="Lastname is required!")
     q_lastname = Q(names__last_name__istartswith=lastname)
 
     # firstname optional
@@ -33,13 +34,16 @@ def search_offenders():
         q_firstname = Q(names__first_name__istartswith=firstname)
 
     # date of birth optional
-    dob = request.args.get("dob")
+    param_dob = request.args.get("dob")
     q_dob = Q()
-    if dob:
-        month, day, year = dob.split("/")
-        q_dob = (Q(dob__year=int(year)) &
-                 Q(dob__month=int(month)) |
-                 Q(dob__day=int(day)))
+    if param_dob:
+        try:
+            dob = datetime.datetime.strptime(param_dob, "%m/%d/%Y")
+        except ValueError:
+            return abort(code=400, description="Date Of Birth format must be MM/dd/YYYY")
+        q_dob = (Q(dob__year=dob.year) &
+                 Q(dob__month=dob.month) |
+                 Q(dob__day=dob.day))
     #  filter all
     results = Offender.objects.filter(
         q_lastname &
