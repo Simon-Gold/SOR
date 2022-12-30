@@ -5,7 +5,7 @@ from apifairy.exceptions import ValidationError
 from mongoengine.queryset.visitor import Q
 from werkzeug.exceptions import NotFound
 # internals
-from schemas import OffenderSchema
+from schemas import OffenderSchema, OffenderUpdateSchema
 from handlers import token_auth
 from models import Offender, OffenderCase
 from decorators import auth_required
@@ -15,6 +15,7 @@ bp_offenders = Blueprint("offenders", __name__)
 
 offender_schema = OffenderSchema()
 offenders_schema = OffenderSchema(many=True)
+offender_update_schema = OffenderUpdateSchema(partial=True)
 
 
 @bp_offenders.route("/search/", methods=["GET"])
@@ -90,6 +91,24 @@ def get_offender(id):
         return offender
     except Offender.DoesNotExist:
         return abort(404)
+
+
+@bp_offenders.route("/offenders/<string:id>", methods=["PUT", "PATCH"])
+@auth_required
+@body(offender_update_schema)
+@response(offender_schema,)
+@other_responses({404: "Offender Not Found"})
+def update_offender(data, id):
+    """Update an offender by id"""
+    try:
+        offender = Offender.objects.get(pk=id)
+        offender.update(**data)
+    except Offender.DoesNotExist:
+        return abort(404)
+    else:
+        offender.save()
+        offender.reload()
+        return offender
 
 
 @bp_offenders.route("/offenders/", methods=["POST"])

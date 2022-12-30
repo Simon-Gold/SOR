@@ -63,3 +63,7 @@ class OffenderSchema(ma.Schema):
     updated_date = ma.DateTime(dump_only=True)
     age = ma.Integer(required=False)
     cases = ma.List(ma.Nested(OffenderCaseSchema), required=False)
+
+
+class OffenderUpdateSchema(OffenderSchema):
+    pass
