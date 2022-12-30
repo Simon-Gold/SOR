@@ -82,12 +82,6 @@ class OffendersTests(BaseTestCase):
                 "month": 1,
                 "day": 1
             },
-            "demographic": {
-                "height": "4' 3\"",
-                "race": "WHITE",
-                "sex": "MALE",
-                "weight": "145 Lbs."
-            },
             "cases": [
                 {
                     "case_number": "",
@@ -122,7 +116,6 @@ class OffendersTests(BaseTestCase):
             payload["dob"]["year"] = year
             payload["dob"]["month"] = month
             payload["dob"]["day"] = day
-            payload["demographic"]["race"] = race
             payload["cases"][0]["case_number"] = case_number
 
             try:
@@ -161,7 +154,6 @@ class OffendersTests(BaseTestCase):
         assert res.json["dob"]["year"] == offender.dob.year
         assert res.json["dob"]["month"] == offender.dob.month
         assert res.json["dob"]["day"] == offender.dob.day
-        assert res.json["demographic"]["race"] == offender.demographic.race
         assert res.json["addresses"][0]["line"] == offender.addresses[0].line
         assert res.json["cases"][0]["case_number"] == offender.cases[0].case_number
         #  generate random 24 character hex string
@@ -269,12 +261,6 @@ class OffendersTests(BaseTestCase):
             "addresses": [{"line": "john street"}],
             "names": [{"first_name": "ally", "last_name": "captain", "middle": "jr"}],
             "dob": {"year": 1987, "month": 1, "day": 22},
-            "demographic": {
-                "height": "4' 3\"",
-                "race": "AMERICAN OR ALASKAN NATIVE",
-                "sex": "MALE",
-                "weight": "135 Lbs."
-            }
         }
         res = self.client.post(url, json=payload, headers=self.headers)
         assert res.status_code == 201

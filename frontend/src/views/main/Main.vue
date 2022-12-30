@@ -12,7 +12,7 @@
         <input
           type="text"
           class="form-control text-small"
-          placeholder="Search Offender (Exp: Lastname Firstname MM/dd/YYY in:SOR)"
+          placeholder="Search Offender (Exp: doe john 1/22/1985 state:AK in:SOR)"
           aria-label="Search Offender"
           aria-describedby="button-addon"
           v-model="searchText"

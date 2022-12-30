@@ -36,10 +36,10 @@ export interface IUserProfileCreate {
 export interface IOffenders {
     id: string;
     state: string;
+    sex: string;
     names: any[];
     addresses: any[];
     dob: any;
-    demographic: any;
     is_deleted: boolean;
     created_date: string;
     updated_date: string;

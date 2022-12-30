@@ -34,20 +34,40 @@ def search_offenders():
     if firstname:
         q_firstname = Q(names__first_name__istartswith=firstname)
 
+    #  state optional
+    state = request.args.get("state")
+    q_state = Q()
+    if state:
+        q_state = Q(state__iexact=state)
     # date of birth optional
     param_dob = request.args.get("dob")
     q_dob = Q()
+    #  TODO move to service
     if param_dob:
-        try:
-            dob = datetime.datetime.strptime(param_dob, "%m/%d/%Y")
-        except ValueError:
-            return abort(code=400, description="Date Of Birth format must be MM/dd/YYYY")
-        q_dob = (Q(dob__year=dob.year) &
-                 Q(dob__month=dob.month) |
-                 Q(dob__day=dob.day))
+        if param_dob.count("/") == 0:
+            try:
+                dob = datetime.datetime.strptime(param_dob, "%Y")
+                q_dob = Q(dob__year=dob.year)
+            except ValueError:
+                return abort(code=400, description="Date Of Birth year format must be YYYY")
+        if param_dob.count("/") == 1:
+            try:
+                dob = datetime.datetime.strptime(param_dob, "%m/%Y")
+                q_dob = Q(dob__year=dob.year) & Q(dob__month=dob.month)
+            except ValueError:
+                return abort(code=400, description="Date Of Birth month/year format must be MM/YYYY")
+        if param_dob.count("/") == 2:
+            try:
+                dob = datetime.datetime.strptime(param_dob, "%m/%d/%Y")
+                q_dob = (Q(dob__year=dob.year) &
+                         Q(dob__month=dob.month) &
+                         Q(dob__day=dob.day))
+            except ValueError:
+                return abort(code=400, description="Date Of Birth month/day/year format must be MM/dd/YYYY")
     #  filter all
     results = Offender.objects.filter(
         q_lastname &
+        q_state &
         q_firstname &
         q_dob
     )

@@ -19,6 +19,11 @@
             <table class="table table-striped">
               <tbody>
                 <tr>
+                  <th>State</th>
+                  <th>:</th>
+                  <th>{{ offender.state }}</th>
+                </tr>
+                <tr>
                   <th style="width: 70px;">Age</th>
                   <th style="width: 10px;">:</th>
                   <td>{{ offender.age }}</td>
@@ -31,22 +36,7 @@
                 <tr>
                   <th>Sex</th>
                   <th>:</th>
-                  <td>{{ offender.demographic.sex }}</td>
-                </tr>
-                <tr>
-                  <th>Race</th>
-                  <th>:</th>
-                  <td>{{ offender.demographic.race }}</td>
-                </tr>
-                <tr>
-                  <th>Height</th>
-                  <th>:</th>
-                  <td>{{ offender.demographic.height }}</td>
-                </tr>
-                <tr>
-                  <th>Weight</th>
-                  <th>:</th>
-                  <td>{{ offender.demographic.weight }}</td>
+                  <td>{{ offender.sex }}</td>
                 </tr>
               </tbody>
             </table>

@@ -25,7 +25,7 @@ class DateOfBirth(db.EmbeddedDocument):
     def __str__(self):
         return f"{self.year}-{self.month}-{self.day}"
 
-
+# TODO remove
 class Demographic(db.EmbeddedDocument):
     height = db.StringField(max_length=24)
     weight = db.StringField(max_length=24)
@@ -54,10 +54,12 @@ class Offender(db.Document):
     created_date = db.DateTimeField(default=datetime.now)
     updated_date = db.DateTimeField(default=datetime.now)
     dob = db.EmbeddedDocumentField(DateOfBirth)
-    demographic = db.EmbeddedDocumentField(Demographic)
     age = db.IntField(min=1, max=12)
+    sex = db.StringField(max_length=24)
     state = db.StringField(max_length=2)
     cases = db.ListField(db.ReferenceField(OffenderCase))
 
     def __str__(self):
-        return f"{self.names[0].first_name} {self.names[0].last_name}"
+        if self.names:
+            return f"{self.names[0].first_name} {self.names[0].last_name}"
+        return super().__str__()

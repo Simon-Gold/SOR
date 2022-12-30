@@ -21,6 +21,10 @@
               </h5>
               <hr class="my-1" />
               <label class="d-block">
+                <strong>State</strong>
+                {{ offender.state }}
+              </label>
+              <label class="d-block">
                 <strong>DOB:</strong> {{ offender.dob.month + "/" + offender.dob.day + "/" + offender.dob.year }}
               </label>
               <label class="d-block"><strong>Address:</strong> {{ offender.addresses[0].line }}</label>
@@ -42,13 +46,17 @@
             <tbody>
               <tr v-for="(offender, index) in offenders">
                 <td>
-                  <button type="button" class="btn btn-link" @click="setOffender(offender)">
-                    {{ offender.names[0].first_name + " " + offender.names[0].middle + " " + offender.names[0].last_name }}
+                  <button type="button" class="btn btn-link text-decoration-none" @click="setOffender(offender)">
+                    {{ offender.names[0].first_name + " " + offender.names[0].middle + " " + offender.names[0].last_name
+}}
                   </button>
                 </td>
                 <td>{{ offender.dob.month + "/" + offender.dob.day + "/" + offender.dob.year }}</td>
                 <td>
                   <span class="d-block" v-for="address in offender.addresses"> {{ address.line }}, </span>
+                </td>
+                <td>
+                  <span class="d-block">{{ offender.state }}</span>
                 </td>
               </tr>
             </tbody>
@@ -108,6 +116,7 @@ export default class Dashboard extends Vue {
   firstName = "";
   lastName = "";
   dob = "";
+  serviceName = "";
   showList = false;
   spinner = false;
   isSearched = false;
@@ -118,9 +127,9 @@ export default class Dashboard extends Vue {
 
   query = "";
   offenderPerPage = 6;
-  totalPages? = 0;
-  totalItems? = 0;
-  currentPage? = 1;
+  totalPages?= 0;
+  totalItems?= 0;
+  currentPage?= 1;
   pageLimit = 10;
   nextUrl?: string;
   prevUrl?: string;
@@ -129,6 +138,7 @@ export default class Dashboard extends Vue {
     { displayName: "Offender", propName: "first_name", sortType: "default", class: "fa-sort" },
     { displayName: "DOB", propName: "dob", sortType: "default", class: "fa-sort" },
     { displayName: "Address", propName: "addresses", sortType: "default", class: "fa-sort" },
+    { displayName: "State", propName: "state", sortType: "default", class: "fa-sort" },
   ];
 
   width = window.innerWidth;
@@ -191,40 +201,77 @@ export default class Dashboard extends Vue {
       await this.search();
     }
   }
+  prepareSearchTextForQuery(searchText) {
+    // remove duplicate spaces
+    searchText = searchText.trim().replace(/\s\s+/g, " ")
+    let splitted = searchText.split(" ");
+    let state = "";
 
+    // search for state and service name
+    for (const word of splitted) {
+      if (word.includes("state")) {
+        state = word.split(":")[1];
+      }
+      if (word.includes("in")) {
+        this.serviceName = word.split(":")[1];
+      }
+    }
+    // find state and service name in search text and remove them
+    let __searchText = searchText;
+    __searchText = __searchText.replace(state, "");
+    __searchText = __searchText.replace(this.serviceName, "");
+
+    let [lastName, firstName, dob] = __searchText.split(" ");
+    if (!lastName) {
+      alert("last name is required!");
+    }
+    firstName = firstName === undefined ? "" : firstName;
+    dob = dob === undefined ? "" : dob;
+
+    return [lastName, firstName, dob, state];
+
+  }
   async search() {
     if (this.searchText) {
-      let split = this.searchText.trim().replace(/\s\s+/g, " ").split(" ");
       this.isSearched = true;
       this.offenders = [];
       this.showList = false;
       this.spinner = true;
       this.query = "";
-      this.query = "?last=" + split[0];
-      if (split[1]) {
-        this.query += "&first=" + split[1];
-        if (split[2]) {
-          this.query += "&dob=" + split[2];
-        }
+
+      let [last, first, dob, state] = this.prepareSearchTextForQuery(this.searchText);
+      this.query = `?last=${last}`;
+      if (first) {
+        this.query += `&first=${first}`;
       }
+      if (dob) {
+        this.query += `&dob=${dob}`;
+      }
+      if (state) {
+        this.query += `&state=${state}`;
+      }
+
+      console.log("QUERY: ", this.query);
+      
+
       await dispatchSearchOffenders(this.$store, { query: this.query })
-      .then((data) => {
-        this.spinner = false;
-        this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
-        this.showList = this.offenders !== undefined && this.offenders.length > 0;
-        this.totalItems = this.offenders?.length;
-        this.totalPages = Math.ceil((this.totalItems ? this.totalItems : 0) / this.offenderPerPage);
-        this.isError = false;
-      })
-      .catch(error =>{
-        const error_data = error.response.data;
-        if(error_data.code){
-          this.isError = true;
-          this.msgError = error_data;
-          this.showList = false;
+        .then((data) => {
           this.spinner = false;
-        }
-      });
+          this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));
+          this.showList = this.offenders !== undefined && this.offenders.length > 0;
+          this.totalItems = this.offenders?.length;
+          this.totalPages = Math.ceil((this.totalItems ? this.totalItems : 0) / this.offenderPerPage);
+          this.isError = false;
+        })
+        .catch(error => {
+          const error_data = error.response.data;
+          if (error_data.code) {
+            this.isError = true;
+            this.msgError = error_data;
+            this.showList = false;
+            this.spinner = false;
+          }
+        });
     } else {
       this.getOffenders("");
     }
@@ -323,6 +370,7 @@ export default class Dashboard extends Vue {
   top: 5px;
   margin-right: 5px;
 }
+
 .box .table thead th {
   border-width: 0px 1px 2px;
   color: #fff;

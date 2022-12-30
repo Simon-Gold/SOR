@@ -18,10 +18,12 @@ pytest -s --disable-warnings
 
 ## Heroku
 - To use heroku cli on macos m series CPU in terminal:
-````
+```
 arch -x86_64 zsh
 ```
-
+## Mongo Engine Remove a Field from models.py
+1. YourModel.objects.update(unset__field_name_to_delete=True)
+2. remove field from class YourModel
 
 
 

@@ -31,13 +31,6 @@ class DateOfBirth(ma.Schema):
                      )
 
 
-class DemographicSchema(ma.Schema):
-    height = ma.String()
-    weight = ma.String()
-    sex = ma.String()
-    race = ma.String()
-
-
 class OffenderNameSchema(ma.Schema):
     first_name = ma.String()
     middle = ma.String()
@@ -54,10 +47,10 @@ class OffenderSchema(ma.Schema):
 
     id = ma.String(unique=True, dump_only=True)
     state = ma.String()
+    sex = ma.String()
     names = ma.List(ma.Nested(OffenderNameSchema), required=True)
     addresses = ma.List(ma.Nested(OffenderAddressSchema), required=True)
     dob = ma.Nested(DateOfBirth, required=True)
-    demographic = ma.Nested(DemographicSchema, required=True)
     is_deleted = ma.Boolean()
     created_date = ma.DateTime(dump_only=True)
     updated_date = ma.DateTime(dump_only=True)
