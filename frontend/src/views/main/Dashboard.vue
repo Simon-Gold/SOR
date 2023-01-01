@@ -2,7 +2,12 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <h4>Offenders List</h4>
+        <h4>
+          Offenders List
+          <span v-if="serviceName">
+            (fetched from {{ serviceName }})
+          </span>
+        </h4>
       </div>
     </div>
     <hr />
@@ -109,7 +114,7 @@ import { readOffenders } from "@/store/main/getters";
 import { dispatchGetOffenders, dispatchSearchOffenders } from "@/store/main/actions";
 import { IOffenders, IOffenderPageModel } from "@/interfaces";
 import { ref } from "vue";
-import { apiAuthURL, apiSorURL } from "@/env";
+import { apiAuthURL, apiSorURL, apiVorURL } from "@/env";
 
 @Component
 export default class Dashboard extends Vue {
@@ -117,6 +122,7 @@ export default class Dashboard extends Vue {
   lastName = "";
   dob = "";
   serviceName = "";
+  serviceApiURL = "";
   showList = false;
   spinner = false;
   isSearched = false;
@@ -207,19 +213,28 @@ export default class Dashboard extends Vue {
     let splitted = searchText.split(" ");
     let state = "";
 
+    // find state and service name in search text and remove them
+    let __searchText = searchText;
     // search for state and service name
     for (const word of splitted) {
       if (word.includes("state")) {
         state = word.split(":")[1];
+        __searchText = __searchText.replace(word, "");
       }
       if (word.includes("in")) {
         this.serviceName = word.split(":")[1];
+        __searchText = __searchText.replace(word, "");
       }
     }
-    // find state and service name in search text and remove them
-    let __searchText = searchText;
-    __searchText = __searchText.replace(state, "");
-    __searchText = __searchText.replace(this.serviceName, "");
+    // specify target service api URL
+    switch (this.serviceName) {
+      case "VOR":
+        this.serviceApiURL = apiVorURL;
+        break;
+      default:
+        this.serviceApiURL = apiSorURL;
+        break;
+    }
 
     let [lastName, firstName, dob] = __searchText.split(" ");
     if (!lastName) {
@@ -252,9 +267,9 @@ export default class Dashboard extends Vue {
       }
 
       console.log("QUERY: ", this.query);
-      
 
-      await dispatchSearchOffenders(this.$store, { query: this.query })
+
+      await dispatchSearchOffenders(this.$store, { query: this.query, serviceApURL: this.serviceApiURL })
         .then((data) => {
           this.spinner = false;
           this.offenders = data?.sort((a, b) => b.created_date.localeCompare(a.created_date, "en-US"));

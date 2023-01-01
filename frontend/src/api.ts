@@ -1,6 +1,6 @@
 import { IOffenders, IOffenderPageModel, IUserPageModel } from "./interfaces/index";
 import axios from "axios";
-import { apiAuthURL, apiSorURL } from "@/env";
+import { apiAuthURL, apiSorURL, apiVorURL } from "@/env";
 import { IUserProfile, IUserProfileUpdate, IUserProfileCreate } from "./interfaces";
 
 function authHeaders(token: string) {
@@ -55,8 +55,8 @@ export const api = {
       token,
     });
   },
-  async search(token: string, query: string) {
-    return axios.get<IOffenders[]>(`${apiSorURL}/api/v1/search/${query}`, authHeaders(token));
+  async search(token: string, query: string, serviceApiURL:string) {
+    return axios.get<IOffenders[]>(`${serviceApiURL}/api/v1/search/${query}`, authHeaders(token));
   },
   async getOffenders(token: string, url: string) {
     url = url ? url : `${apiSorURL}/api/v1/offenders/`;

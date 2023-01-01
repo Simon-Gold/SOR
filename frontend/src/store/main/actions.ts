@@ -162,11 +162,11 @@ export const actions = {
       commitAddNotification(context, { color: "error", content: "Error resetting password" });
     }
   },
-  async actionSearchOffender(context: MainContext, payload: { query: string }) {
+  async actionSearchOffender(context: MainContext, payload: { query: string, serviceApURL: string }) {
     try {
       const response = (
         await Promise.all([
-          api.search(context.state.token, payload.query),
+          api.search(context.state.token, payload.query, payload.serviceApURL),
           await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
         ])
       )[0];
