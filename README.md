@@ -9,6 +9,8 @@ docker attach <container-id>
 docker exec -it mongodb mongosh -u developer -p developer
 # see docker container ip address
 docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container-name>
+# copy files from an image.Exp; cp <image-id>:<source-PATH> <target-PATH>
+docker container cp 3dab08807764:/usr/src/app ./tmp
 ```
 
 ## Run Backend TESTS

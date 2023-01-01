@@ -41,7 +41,7 @@ from payload import first_names, last_names, races, address_lines, states
 # NOTE paste your token
 token = "<paste your token here>"
 
-base_url = f"http://localhost:5000/api/v1/"
+base_url = f"http://localhost:5002/api/v1/"
 endpoint = f"offenders/"
 url = f"{base_url}{endpoint}"
 headers = {"Authorization": f"Bearer {token}"}

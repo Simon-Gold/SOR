@@ -34,7 +34,25 @@ services:
     stdin_open: true
     tty: true
 
+  service-vor:
+    container_name: service-vor
+    build:
+      context: ./backend
+      dockerfile: service-vor/Dockerfile
+    volumes:
+      - ./backend/service-vor/:/usr/src/app/
+      - ./backend/core/:/usr/src/app/core
+    ports:
+      - 5002:5002
+    env_file:
+      - ./backend/service-vor/.env
+    depends_on:
+      - db
+    # restart: always
+    stdin_open: true
+    tty: true
 
+  # instead of common db, seperation is better ?
   db:
     image: mongo:latest
     container_name: mongodb
