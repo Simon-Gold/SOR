@@ -33,3 +33,5 @@ env310
 venv*
 
 .github
+
+frontend/dist*
